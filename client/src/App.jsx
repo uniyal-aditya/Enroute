@@ -15,11 +15,11 @@ import { AlertCircle, ArrowLeft } from 'lucide-react'
 function NotFound() {
   return (
     <div className="card mx-auto my-24 max-w-md p-10 text-center space-y-4">
-      <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-800 text-blue-400">
+      <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 border border-blue-100">
         <AlertCircle className="h-7 w-7" />
       </div>
-      <h1 className="text-3xl font-extrabold text-white font-display">404</h1>
-      <p className="text-xs text-slate-400">
+      <h1 className="text-3xl font-extrabold text-slate-900 font-display">404</h1>
+      <p className="text-xs text-slate-500">
         The logistics page or route you are searching for does not exist.
       </p>
       <Link to="/" className="btn-primary inline-flex text-xs">
@@ -32,7 +32,7 @@ function NotFound() {
 
 export default function App() {
   return (
-    <div className="flex min-h-screen flex-col bg-[#0B1120] text-slate-100">
+    <div className="flex min-h-screen flex-col bg-slate-50 text-slate-800 antialiased">
       <Navbar />
       <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-6 sm:px-6 lg:px-8">
         <Routes>

@@ -31,11 +31,8 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (res) => res,
   (err) => {
-    if (err.response?.status === 401 && localStorage.getItem(TOKEN_KEY)) {
+    if (err.response?.status === 401) {
       localStorage.removeItem(TOKEN_KEY)
-      if (!window.location.pathname.startsWith('/login') && !window.location.pathname.startsWith('/register')) {
-        window.location.href = '/login'
-      }
     }
     return Promise.reject(err)
   }

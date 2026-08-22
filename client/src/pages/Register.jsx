@@ -58,8 +58,8 @@ export default function Register() {
     <div className="mx-auto mt-6 max-w-lg py-6">
       <div className="card p-6 sm:p-8 space-y-6">
         <div className="space-y-1">
-          <h1 className="text-2xl font-extrabold text-white">Join Enroute</h1>
-          <p className="text-xs text-slate-400">
+          <h1 className="text-2xl font-extrabold text-slate-900">Join Enroute</h1>
+          <p className="text-xs text-slate-500">
             Create an account to start shipping freight or publishing truck routes.
           </p>
         </div>
@@ -78,15 +78,15 @@ export default function Register() {
                   onClick={() => setForm({ ...form, role: r.value })}
                   className={`rounded-2xl border p-4 text-left transition duration-150 ${
                     isSelected
-                      ? 'border-blue-500 bg-blue-600/15 ring-2 ring-blue-500/20'
-                      : 'border-slate-800 bg-slate-900/60 hover:border-slate-700'
+                      ? 'border-blue-600 bg-blue-50/80 ring-2 ring-blue-500/20'
+                      : 'border-slate-200 bg-slate-50/60 hover:border-slate-300 hover:bg-slate-50'
                   }`}
                 >
                   <Icon
-                    className={`h-5 w-5 mb-2 ${isSelected ? 'text-blue-400' : 'text-slate-400'}`}
+                    className={`h-5 w-5 mb-2 ${isSelected ? 'text-blue-600' : 'text-slate-400'}`}
                   />
-                  <span className="block text-xs font-bold text-white">{r.title}</span>
-                  <span className="mt-1 block text-[11px] text-slate-400 leading-tight">
+                  <span className={`block text-xs font-bold ${isSelected ? 'text-blue-900' : 'text-slate-900'}`}>{r.title}</span>
+                  <span className="mt-1 block text-[11px] text-slate-500 leading-tight">
                     {r.desc}
                   </span>
                 </button>
@@ -101,7 +101,7 @@ export default function Register() {
               Full Name / Contact Person
             </label>
             <div className="relative">
-              <User className="pointer-events-none absolute left-3.5 top-3 h-4 w-4 text-slate-500" />
+              <User className="pointer-events-none absolute left-3.5 top-3 h-4 w-4 text-slate-400" />
               <input
                 id="name"
                 required
@@ -120,7 +120,7 @@ export default function Register() {
                 Email Address
               </label>
               <div className="relative">
-                <Mail className="pointer-events-none absolute left-3.5 top-3 h-4 w-4 text-slate-500" />
+                <Mail className="pointer-events-none absolute left-3.5 top-3 h-4 w-4 text-slate-400" />
                 <input
                   id="email"
                   type="email"
@@ -139,7 +139,7 @@ export default function Register() {
                 Mobile Number
               </label>
               <div className="relative">
-                <Phone className="pointer-events-none absolute left-3.5 top-3 h-4 w-4 text-slate-500" />
+                <Phone className="pointer-events-none absolute left-3.5 top-3 h-4 w-4 text-slate-400" />
                 <input
                   id="phone"
                   required
@@ -159,7 +159,7 @@ export default function Register() {
               Password (min. 6 characters)
             </label>
             <div className="relative">
-              <Lock className="pointer-events-none absolute left-3.5 top-3 h-4 w-4 text-slate-500" />
+              <Lock className="pointer-events-none absolute left-3.5 top-3 h-4 w-4 text-slate-400" />
               <input
                 id="password"
                 type="password"
@@ -177,7 +177,7 @@ export default function Register() {
           <div>
             <label className="label">Company / Business Name (Optional)</label>
             <div className="relative">
-              <Building className="pointer-events-none absolute left-3.5 top-3 h-4 w-4 text-slate-500" />
+              <Building className="pointer-events-none absolute left-3.5 top-3 h-4 w-4 text-slate-400" />
               <input
                 maxLength={100}
                 placeholder="e.g. Garhwal Logistics / Verma Handicrafts"
@@ -190,8 +190,8 @@ export default function Register() {
 
           {/* Driver specific dynamic fleet fields */}
           {form.role === 'DRIVER' && (
-            <div className="rounded-2xl bg-slate-950 p-4 border border-slate-800 space-y-3">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-blue-400 flex items-center gap-1.5">
+            <div className="rounded-2xl bg-slate-50 p-4 border border-slate-200 space-y-3">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-blue-700 flex items-center gap-1.5">
                 <Truck className="h-3.5 w-3.5" />
                 Vehicle Details (Optional)
               </span>
@@ -237,9 +237,9 @@ export default function Register() {
           </button>
         </form>
 
-        <div className="border-t border-slate-800 pt-4 text-center text-xs text-slate-400">
+        <div className="border-t border-slate-100 pt-4 text-center text-xs text-slate-500">
           Already registered?{' '}
-          <Link to="/login" className="font-bold text-blue-400 hover:text-blue-300 transition">
+          <Link to="/login" className="font-bold text-blue-600 hover:text-blue-700 transition">
             Sign In
           </Link>
         </div>

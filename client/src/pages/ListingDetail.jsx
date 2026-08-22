@@ -104,9 +104,9 @@ function BookingRequestForm({ listing, onBooked }) {
         </div>
       </div>
 
-      <div className="rounded-xl bg-slate-900 border border-slate-800 p-3 text-xs text-slate-400">
-        <p className="flex items-center gap-1.5 text-slate-300 font-semibold mb-0.5">
-          <Info className="h-3.5 w-3.5 text-blue-400" />
+      <div className="rounded-xl bg-slate-50 border border-slate-200 p-3 text-xs text-slate-600">
+        <p className="flex items-center gap-1.5 text-slate-800 font-semibold mb-0.5">
+          <Info className="h-3.5 w-3.5 text-blue-600" />
           Direct Coordination Notice:
         </p>
         Driver contact will be disclosed once the driver accepts your shipment. Payments are handled offline upon pickup.
@@ -158,8 +158,8 @@ export default function ListingDetail() {
   if (loading) {
     return (
       <div className="py-24 text-center space-y-3">
-        <div className="h-8 w-8 mx-auto animate-spin rounded-full border-2 border-blue-500 border-t-transparent" />
-        <p className="text-xs text-slate-400">Loading route details…</p>
+        <div className="h-8 w-8 mx-auto animate-spin rounded-full border-2 border-blue-600 border-t-transparent" />
+        <p className="text-xs text-slate-500">Loading route details…</p>
       </div>
     )
   }
@@ -167,9 +167,9 @@ export default function ListingDetail() {
   if (notFound || !listing) {
     return (
       <div className="card mx-auto mt-12 max-w-md p-8 text-center space-y-4">
-        <AlertCircle className="mx-auto h-12 w-12 text-slate-500" />
-        <h2 className="text-lg font-bold text-white">Route not found</h2>
-        <p className="text-xs text-slate-400">
+        <AlertCircle className="mx-auto h-12 w-12 text-slate-400" />
+        <h2 className="text-lg font-bold text-slate-900">Route not found</h2>
+        <p className="text-xs text-slate-500">
           This route listing may have been cancelled by the driver or the link is invalid.
         </p>
         <Link to="/routes" className="btn-primary inline-flex text-xs">
@@ -187,7 +187,7 @@ export default function ListingDetail() {
       {/* Breadcrumb back */}
       <Link
         to="/routes"
-        className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-400 hover:text-blue-300 transition"
+        className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 hover:text-blue-700 transition"
       >
         <ArrowLeft className="h-3.5 w-3.5" />
         Back to all routes
@@ -200,10 +200,10 @@ export default function ListingDetail() {
           <div className="card p-6 space-y-6">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
-                <h1 className="text-2xl sm:text-3xl font-extrabold text-white">
+                <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
                   {listing.origin} → {listing.destination}
                 </h1>
-                <p className="text-xs text-slate-400 mt-1">
+                <p className="text-xs text-slate-500 mt-1">
                   Trip ID #{listing.id} · Listed {formatDateTime(listing.created_at)}
                 </p>
               </div>
@@ -220,12 +220,12 @@ export default function ListingDetail() {
             />
 
             {/* Core Trip Specs Grid */}
-            <div className="grid grid-cols-2 gap-4 rounded-2xl bg-slate-950/80 border border-slate-800 p-4 text-xs sm:grid-cols-3">
+            <div className="grid grid-cols-2 gap-4 rounded-2xl bg-slate-50 border border-slate-200 p-4 text-xs sm:grid-cols-3">
               <div>
                 <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">
                   Departure Time
                 </span>
-                <p className="mt-1 font-bold text-white text-sm">
+                <p className="mt-1 font-bold text-slate-900 text-sm">
                   {formatDateTime(listing.departure_date)}
                 </p>
               </div>
@@ -234,7 +234,7 @@ export default function ListingDetail() {
                 <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">
                   Total Distance
                 </span>
-                <p className="mt-1 font-bold text-white text-sm">
+                <p className="mt-1 font-bold text-slate-900 text-sm">
                   {Math.round(listing.distance_km)} km
                 </p>
               </div>
@@ -243,11 +243,11 @@ export default function ListingDetail() {
                 <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">
                   Freight Rate
                 </span>
-                <p className="mt-1 font-bold text-blue-400 text-sm font-display">
+                <p className="mt-1 font-bold text-blue-600 text-sm font-display">
                   ₹{listing.rate_per_km}/km
                 </p>
                 {listing.flat_rate && (
-                  <span className="text-[10px] text-emerald-400">₹{listing.flat_rate} flat</span>
+                  <span className="text-[10px] text-emerald-700 font-semibold">₹{listing.flat_rate} flat</span>
                 )}
               </div>
 
@@ -255,31 +255,31 @@ export default function ListingDetail() {
                 <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">
                   Truck Model
                 </span>
-                <p className="mt-1 font-bold text-slate-200">{listing.truck_type}</p>
+                <p className="mt-1 font-bold text-slate-800">{listing.truck_type}</p>
               </div>
 
               <div>
                 <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">
                   Total Capacity
                 </span>
-                <p className="mt-1 font-bold text-slate-200">{listing.truck_capacity}</p>
+                <p className="mt-1 font-bold text-slate-800">{listing.truck_capacity}</p>
               </div>
 
               <div>
                 <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">
                   Available Space
                 </span>
-                <p className="mt-1 font-bold text-emerald-400">{listing.available_space}</p>
+                <p className="mt-1 font-bold text-emerald-700">{listing.available_space}</p>
               </div>
             </div>
 
             {/* Driver Notes */}
             {listing.description && (
-              <div className="border-t border-slate-800 pt-4 space-y-1.5">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-300">
+              <div className="border-t border-slate-200 pt-4 space-y-1.5">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700">
                   Notes from Driver
                 </h3>
-                <p className="text-xs text-slate-400 leading-relaxed whitespace-pre-line bg-slate-900/60 p-3 rounded-xl border border-slate-800">
+                <p className="text-xs text-slate-600 leading-relaxed whitespace-pre-line bg-slate-50 p-3 rounded-xl border border-slate-200">
                   {listing.description}
                 </p>
               </div>
@@ -289,43 +289,43 @@ export default function ListingDetail() {
           {/* Driver Profile Card */}
           <div className="card p-6 space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-600">
                 Driver &amp; Vehicle Profile
               </h3>
-              <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full">
+              <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
                 <ShieldCheck className="h-3 w-3" />
                 Verified Driver Account
               </span>
             </div>
 
             <div className="flex items-start gap-4">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-blue-600 font-bold text-white text-lg shadow-lg shadow-blue-600/30">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-blue-600 font-bold text-white text-lg shadow-md shadow-blue-600/20">
                 {listing.driver?.name?.charAt(0) || 'D'}
               </div>
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
-                  <h4 className="text-base font-bold text-white">{listing.driver?.name}</h4>
-                  <div className="flex items-center gap-0.5 text-xs text-amber-400 font-semibold">
+                  <h4 className="text-base font-bold text-slate-900">{listing.driver?.name}</h4>
+                  <div className="flex items-center gap-0.5 text-xs text-amber-500 font-semibold">
                     <Star className="h-3.5 w-3.5 fill-amber-400" />
                     <span>4.9</span>
-                    <span className="text-[10px] text-slate-500 font-normal">(18 trips)</span>
+                    <span className="text-[10px] text-slate-400 font-normal">(18 trips)</span>
                   </div>
                 </div>
 
                 {listing.driver?.company_name && (
-                  <p className="text-xs font-medium text-slate-300">
+                  <p className="text-xs font-medium text-slate-700">
                     {listing.driver.company_name}
                   </p>
                 )}
 
                 {listing.driver?.vehicle_number && (
-                  <p className="text-xs font-mono text-blue-400">
+                  <p className="text-xs font-mono text-blue-600 font-semibold">
                     Vehicle: {listing.driver.vehicle_number}
                   </p>
                 )}
 
                 {listing.driver?.bio && (
-                  <p className="text-xs text-slate-400 pt-1 leading-relaxed">
+                  <p className="text-xs text-slate-600 pt-1 leading-relaxed">
                     {listing.driver.bio}
                   </p>
                 )}
@@ -340,11 +340,11 @@ export default function ListingDetail() {
             {/* Unauthenticated view */}
             {!user && (
               <div className="space-y-4 text-center py-4">
-                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-600/20 text-blue-400 border border-blue-500/30">
+                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 border border-blue-200">
                   <Package className="h-6 w-6" />
                 </div>
-                <h3 className="text-lg font-bold text-white">Need to Ship on this Route?</h3>
-                <p className="text-xs text-slate-400 leading-relaxed">
+                <h3 className="text-lg font-bold text-slate-900">Need to Ship on this Route?</h3>
+                <p className="text-xs text-slate-600 leading-relaxed">
                   Sign in or register as a Customer to send a delivery request to {listing.driver?.name}. Direct WhatsApp &amp; Phone call contact will unlock immediately upon driver approval.
                 </p>
                 <div className="space-y-2 pt-2">
@@ -361,16 +361,16 @@ export default function ListingDetail() {
             {/* Driver owner viewing own listing */}
             {isOwner && (
               <div className="space-y-3">
-                <div className="flex items-center gap-2 text-blue-400">
+                <div className="flex items-center gap-2 text-blue-600">
                   <Truck className="h-5 w-5" />
-                  <h3 className="text-base font-bold text-white">Your Listed Route</h3>
+                  <h3 className="text-base font-bold text-slate-900">Your Listed Route</h3>
                 </div>
-                <p className="text-xs text-slate-400 leading-relaxed">
+                <p className="text-xs text-slate-600 leading-relaxed">
                   Incoming requests from senders for this trip appear on your Driver Dashboard. Accept them to reveal customer contact details.
                 </p>
-                <div className="rounded-xl bg-slate-950 p-3 text-xs text-slate-300 border border-slate-800 space-y-1">
+                <div className="rounded-xl bg-slate-50 p-3 text-xs text-slate-700 border border-slate-200 space-y-1">
                   <span className="text-slate-500 text-[10px] uppercase font-bold">Your Registered Phone</span>
-                  <p className="font-mono font-bold text-white">{listing.contact_phone}</p>
+                  <p className="font-mono font-bold text-slate-900">{listing.contact_phone}</p>
                 </div>
                 <Link to="/driver" className="btn-primary w-full text-xs">
                   Go to Driver Dashboard
@@ -381,9 +381,9 @@ export default function ListingDetail() {
             {/* Other Driver viewing */}
             {user && !isOwner && user.role === 'DRIVER' && (
               <div className="space-y-3 text-center py-4">
-                <AlertCircle className="mx-auto h-10 w-10 text-amber-400" />
-                <h3 className="text-base font-bold text-white">Driver Account Detected</h3>
-                <p className="text-xs text-slate-400">
+                <AlertCircle className="mx-auto h-10 w-10 text-amber-500" />
+                <h3 className="text-base font-bold text-slate-900">Driver Account Detected</h3>
+                <p className="text-xs text-slate-600">
                   Only Customer accounts can request goods transportation. Drivers post and manage their own routes.
                 </p>
                 <Link to="/driver" className="btn-secondary w-full text-xs">
@@ -396,7 +396,7 @@ export default function ListingDetail() {
             {user && !isOwner && user.role === 'CUSTOMER' && (
               <div className="space-y-5">
                 {myBooking === undefined && (
-                  <div className="py-8 text-center text-xs text-slate-400">
+                  <div className="py-8 text-center text-xs text-slate-500">
                     Checking active booking status…
                   </div>
                 )}
@@ -404,12 +404,12 @@ export default function ListingDetail() {
                 {/* State A: Booking CONFIRMED -> Reveal Contact */}
                 {myBooking?.status === 'CONFIRMED' && (
                   <div className="space-y-4">
-                    <div className="rounded-2xl border border-emerald-500/40 bg-emerald-500/10 p-4 space-y-2">
-                      <div className="flex items-center gap-2 text-emerald-400 font-bold text-sm">
+                    <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 space-y-2">
+                      <div className="flex items-center gap-2 text-emerald-700 font-bold text-sm">
                         <ShieldCheck className="h-5 w-5" />
                         <span>Booking Confirmed by Driver!</span>
                       </div>
-                      <p className="text-xs text-slate-300 leading-relaxed">
+                      <p className="text-xs text-slate-700 leading-relaxed">
                         {listing.driver?.name} accepted your booking request #{myBooking.id}. You can now coordinate pickup location &amp; timings directly.
                       </p>
                     </div>
@@ -435,7 +435,7 @@ export default function ListingDetail() {
 
                           <a
                             href={phoneCallLink(myBooking.contact_phone)}
-                            className="btn-secondary w-full text-xs font-bold text-blue-400 hover:text-blue-300"
+                            className="btn-secondary w-full text-xs font-bold text-blue-600 hover:text-blue-700"
                           >
                             <PhoneCall className="h-4 w-4" />
                             Call Driver Directly
@@ -449,22 +449,22 @@ export default function ListingDetail() {
                 {/* State B: Booking PENDING */}
                 {myBooking?.status === 'PENDING' && (
                   <div className="space-y-4">
-                    <div className="rounded-2xl border border-amber-500/40 bg-amber-500/10 p-4 space-y-2">
-                      <div className="flex items-center gap-2 text-amber-400 font-bold text-sm">
-                        <Clock className="h-5 w-5 animate-pulse" />
+                    <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 space-y-2">
+                      <div className="flex items-center gap-2 text-amber-800 font-bold text-sm">
+                        <Clock className="h-5 w-5 animate-pulse text-amber-600" />
                         <span>Request Sent to Driver</span>
                       </div>
-                      <p className="text-xs text-slate-300 leading-relaxed">
+                      <p className="text-xs text-slate-700 leading-relaxed">
                         Your booking request #{myBooking.id} is waiting for {listing.driver?.name}'s review. Contact actions unlock immediately once confirmed.
                       </p>
                     </div>
 
                     <StatusTimeline status="PENDING" />
 
-                    <div className="rounded-xl bg-slate-950 p-3.5 border border-slate-800 text-xs space-y-2">
+                    <div className="rounded-xl bg-slate-50 p-3.5 border border-slate-200 text-xs space-y-2">
                       <span className="text-[10px] uppercase font-bold text-slate-500">Your Submitted Shipment</span>
-                      <p className="text-slate-300 font-medium">{myBooking.goods_description}</p>
-                      <p className="text-slate-400 text-[11px]">Weight: {myBooking.estimated_weight}</p>
+                      <p className="text-slate-800 font-medium">{myBooking.goods_description}</p>
+                      <p className="text-slate-600 text-[11px]">Weight: {myBooking.estimated_weight}</p>
                     </div>
                   </div>
                 )}
@@ -472,12 +472,12 @@ export default function ListingDetail() {
                 {/* State C: Booking REJECTED */}
                 {myBooking?.status === 'REJECTED' && !showRetryForm && (
                   <div className="space-y-4">
-                    <div className="rounded-2xl border border-red-500/40 bg-red-500/10 p-4 space-y-2">
-                      <div className="flex items-center gap-2 text-red-400 font-bold text-sm">
-                        <AlertCircle className="h-5 w-5" />
+                    <div className="rounded-2xl border border-red-200 bg-red-50 p-4 space-y-2">
+                      <div className="flex items-center gap-2 text-red-700 font-bold text-sm">
+                        <AlertCircle className="h-5 w-5 text-red-600" />
                         <span>Request Declined</span>
                       </div>
-                      <p className="text-xs text-slate-300 leading-relaxed">
+                      <p className="text-xs text-slate-700 leading-relaxed">
                         The driver was unable to accommodate this shipment request. You can send a revised request with different volume details.
                       </p>
                     </div>
@@ -495,16 +495,16 @@ export default function ListingDetail() {
                 {(myBooking === null || (myBooking?.status === 'REJECTED' && showRetryForm)) && (
                   <div>
                     {listing.status !== 'ACTIVE' ? (
-                      <div className="rounded-xl bg-amber-500/10 border border-amber-500/30 p-4 text-xs text-amber-300 text-center">
+                      <div className="rounded-xl bg-amber-50 border border-amber-200 p-4 text-xs text-amber-800 text-center">
                         This route is {listing.status.toLowerCase()} and is no longer accepting delivery requests.
                       </div>
                     ) : (
                       <div className="space-y-4">
                         <div>
-                          <h3 className="text-base font-bold text-white">
+                          <h3 className="text-base font-bold text-slate-900">
                             Request Delivery Space
                           </h3>
-                          <p className="text-xs text-slate-400 mt-0.5">
+                          <p className="text-xs text-slate-600 mt-0.5">
                             Submit your cargo details for {listing.driver?.name}'s review.
                           </p>
                         </div>

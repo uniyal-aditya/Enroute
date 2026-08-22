@@ -15,8 +15,6 @@ import {
 import api, { getApiError } from '../api/client'
 import ListingCard from '../components/ListingCard.jsx'
 import RouteMap from '../components/RouteMap.jsx'
-import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet'
-import '../utils/mapIcons.js'
 
 const EMPTY_FILTERS = {
   origin: '',
@@ -77,22 +75,22 @@ export default function BrowseRoutes() {
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-white">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
             Logistics Route Marketplace
           </h1>
-          <p className="text-xs sm:text-sm text-slate-400 mt-0.5">
+          <p className="text-xs sm:text-sm text-slate-600 mt-0.5">
             Discover trucks with spare payload capacity along your required delivery corridors.
           </p>
         </div>
 
         {/* Mobile List / Map toggle */}
-        <div className="flex items-center gap-1 rounded-xl border border-slate-800 bg-slate-900/90 p-1 lg:hidden self-start">
+        <div className="flex items-center gap-1 rounded-xl border border-slate-200 bg-white p-1 lg:hidden self-start shadow-xs">
           <button
             onClick={() => setMobileView('list')}
             className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
               mobileView === 'list'
-                ? 'bg-blue-600 text-white shadow-sm'
-                : 'text-slate-400 hover:text-white'
+                ? 'bg-blue-600 text-white shadow-xs'
+                : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             <List className="h-3.5 w-3.5" />
@@ -102,8 +100,8 @@ export default function BrowseRoutes() {
             onClick={() => setMobileView('map')}
             className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
               mobileView === 'map'
-                ? 'bg-blue-600 text-white shadow-sm'
-                : 'text-slate-400 hover:text-white'
+                ? 'bg-blue-600 text-white shadow-xs'
+                : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             <MapIcon className="h-3.5 w-3.5" />
@@ -116,7 +114,7 @@ export default function BrowseRoutes() {
       <div className="card p-4">
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
           <div className="relative">
-            <MapPin className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-emerald-400" />
+            <MapPin className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-emerald-600" />
             <input
               className="input !pl-9"
               placeholder="Origin (e.g. Dehradun)"
@@ -126,7 +124,7 @@ export default function BrowseRoutes() {
           </div>
 
           <div className="relative">
-            <MapPin className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-blue-400" />
+            <MapPin className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-blue-600" />
             <input
               className="input !pl-9"
               placeholder="Destination (e.g. Delhi)"
@@ -136,7 +134,7 @@ export default function BrowseRoutes() {
           </div>
 
           <div className="relative">
-            <Truck className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-500" />
+            <Truck className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-400" />
             <input
               className="input !pl-9"
               placeholder="Truck type (e.g. Tata 407)"
@@ -146,7 +144,7 @@ export default function BrowseRoutes() {
           </div>
 
           <div className="relative">
-            <DollarSign className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-500" />
+            <DollarSign className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-400" />
             <input
               type="number"
               className="input !pl-9"
@@ -171,8 +169,8 @@ export default function BrowseRoutes() {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 items-start">
         {/* Left Column: Route Cards */}
         <div className={`lg:col-span-6 space-y-3.5 ${mobileView === 'map' ? 'hidden lg:block' : 'block'}`}>
-          <div className="flex items-center justify-between text-xs text-slate-400 px-1">
-            <span>Showing <strong className="text-white">{listings.length}</strong> active routes</span>
+          <div className="flex items-center justify-between text-xs text-slate-500 px-1">
+            <span>Showing <strong className="text-slate-900">{listings.length}</strong> active routes</span>
             <span>Click any route to preview route map</span>
           </div>
 
@@ -180,19 +178,19 @@ export default function BrowseRoutes() {
             <div className="space-y-3">
               {[1, 2, 3].map((n) => (
                 <div key={n} className="card p-5 animate-pulse space-y-3">
-                  <div className="h-5 w-40 bg-slate-800 rounded" />
-                  <div className="h-4 w-28 bg-slate-800 rounded" />
-                  <div className="h-10 w-full bg-slate-800 rounded" />
+                  <div className="h-5 w-40 bg-slate-200 rounded" />
+                  <div className="h-4 w-28 bg-slate-200 rounded" />
+                  <div className="h-10 w-full bg-slate-200 rounded" />
                 </div>
               ))}
             </div>
           ) : listings.length === 0 ? (
             <div className="card p-10 text-center space-y-3">
-              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-800 text-slate-400">
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-100 text-slate-500">
                 <Search className="h-6 w-6" />
               </div>
-              <h3 className="text-base font-bold text-white">No routes match your search</h3>
-              <p className="text-xs text-slate-400 max-w-sm mx-auto">
+              <h3 className="text-base font-bold text-slate-900">No routes match your search</h3>
+              <p className="text-xs text-slate-500 max-w-sm mx-auto">
                 Try clearing some filters or searching for nearby major cities. Drivers post new journeys every morning.
               </p>
               <button onClick={clearFilters} className="btn-primary !py-2 text-xs">
@@ -222,15 +220,15 @@ export default function BrowseRoutes() {
           <div className="card p-4 space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="flex h-2 w-2 rounded-full bg-blue-400 animate-pulse" />
-                <h3 className="text-sm font-bold text-white">
+                <span className="flex h-2 w-2 rounded-full bg-blue-600 animate-pulse" />
+                <h3 className="text-sm font-bold text-slate-900">
                   {selectedRoute
                     ? `${selectedRoute.origin} → ${selectedRoute.destination}`
                     : 'Selected Route Map'}
                 </h3>
               </div>
               {selectedRoute && (
-                <span className="text-xs font-mono text-blue-400">
+                <span className="text-xs font-mono font-bold text-blue-600">
                   {Math.round(selectedRoute.distance_km)} km
                 </span>
               )}
@@ -245,20 +243,20 @@ export default function BrowseRoutes() {
                 className="h-80 sm:h-96"
               />
             ) : (
-              <div className="flex h-80 items-center justify-center rounded-2xl border border-slate-800 bg-slate-950 text-xs text-slate-500">
+              <div className="flex h-80 items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 text-xs text-slate-500">
                 Select a route from the list to preview on map
               </div>
             )}
 
             {selectedRoute && (
-              <div className="rounded-xl bg-slate-800/80 border border-slate-700/60 p-3 flex items-center justify-between text-xs">
+              <div className="rounded-xl bg-slate-50 border border-slate-200 p-3 flex items-center justify-between text-xs">
                 <div>
-                  <span className="text-slate-400">Truck: </span>
-                  <span className="font-semibold text-white">{selectedRoute.truck_type}</span>
-                  <span className="text-slate-400 ml-2">Space: </span>
-                  <span className="font-semibold text-emerald-400">{selectedRoute.available_space}</span>
+                  <span className="text-slate-500">Truck: </span>
+                  <span className="font-semibold text-slate-900">{selectedRoute.truck_type}</span>
+                  <span className="text-slate-500 ml-2">Space: </span>
+                  <span className="font-semibold text-emerald-700">{selectedRoute.available_space}</span>
                 </div>
-                <span className="font-bold text-blue-400 text-sm font-display">
+                <span className="font-bold text-blue-600 text-sm font-display">
                   ₹{selectedRoute.rate_per_km}/km
                 </span>
               </div>

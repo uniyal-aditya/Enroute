@@ -40,8 +40,8 @@ export default function Login() {
 
       <div className="card p-6 sm:p-8 space-y-6">
         <div className="space-y-1">
-          <h1 className="text-2xl font-extrabold text-white">Welcome Back</h1>
-          <p className="text-xs text-slate-400">
+          <h1 className="text-2xl font-extrabold text-slate-900">Welcome Back</h1>
+          <p className="text-xs text-slate-500">
             Sign in to access your Enroute shipments and route listings.
           </p>
         </div>
@@ -52,7 +52,7 @@ export default function Login() {
               Email Address
             </label>
             <div className="relative">
-              <Mail className="pointer-events-none absolute left-3.5 top-3 h-4 w-4 text-slate-500" />
+              <Mail className="pointer-events-none absolute left-3.5 top-3 h-4 w-4 text-slate-400" />
               <input
                 id="email"
                 type="email"
@@ -73,7 +73,7 @@ export default function Login() {
               </label>
             </div>
             <div className="relative">
-              <Lock className="pointer-events-none absolute left-3.5 top-3 h-4 w-4 text-slate-500" />
+              <Lock className="pointer-events-none absolute left-3.5 top-3 h-4 w-4 text-slate-400" />
               <input
                 id="password"
                 type="password"
@@ -97,9 +97,9 @@ export default function Login() {
           </button>
         </form>
 
-        <div className="border-t border-slate-800 pt-4 text-center text-xs text-slate-400">
+        <div className="border-t border-slate-100 pt-4 text-center text-xs text-slate-500">
           Don't have an account yet?{' '}
-          <Link to="/register" className="font-bold text-blue-400 hover:text-blue-300 transition">
+          <Link to="/register" className="font-bold text-blue-600 hover:text-blue-700 transition">
             Create Account
           </Link>
         </div>

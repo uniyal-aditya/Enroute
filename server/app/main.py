@@ -9,6 +9,15 @@ from app.routers import auth, listings, bookings, seed
 # Creates tables if they don't exist yet
 Base.metadata.create_all(bind=engine)
 
+# Auto-seed demo data on startup if fresh database
+from app.database import SessionLocal
+from app.routers.seed import seed_database
+try:
+    with SessionLocal() as db_session:
+        seed_database(db_session)
+except Exception as e:
+    print(f"[Enroute DB Startup Notice] {e}")
+
 app = FastAPI(
     title="Enroute Logistics API",
     description="Smart India Hackathon 2026 platform connecting truck drivers with spare cargo capacity to businesses and shippers.",

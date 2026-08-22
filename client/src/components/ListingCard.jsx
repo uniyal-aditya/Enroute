@@ -7,20 +7,20 @@ export default function ListingCard({ listing, isSelected = false }) {
     <Link
       to={`/routes/${listing.id}`}
       className={`card-glow block p-5 group ${
-        isSelected ? 'border-blue-500 ring-2 ring-blue-500/20 bg-slate-850' : ''
+        isSelected ? 'border-blue-500 ring-2 ring-blue-500/20 bg-blue-50/40' : 'bg-white'
       }`}
     >
       {/* Top Header: Route & Status */}
       <div className="flex items-start justify-between gap-3">
         <div>
-          <div className="flex items-center gap-2 text-base font-bold text-white group-hover:text-blue-400 transition-colors">
+          <div className="flex items-center gap-2 text-base font-bold text-slate-900 group-hover:text-blue-600 transition-colors">
             <span className="truncate max-w-[140px] sm:max-w-[180px]">{listing.origin}</span>
-            <ArrowRight className="h-4 w-4 shrink-0 text-blue-500 group-hover:translate-x-0.5 transition-transform" />
+            <ArrowRight className="h-4 w-4 shrink-0 text-blue-600 group-hover:translate-x-0.5 transition-transform" />
             <span className="truncate max-w-[140px] sm:max-w-[180px]">{listing.destination}</span>
           </div>
-          <div className="mt-1 flex items-center gap-2 text-xs text-slate-400">
+          <div className="mt-1 flex items-center gap-2 text-xs text-slate-500">
             <span className="flex items-center gap-1">
-              <Calendar className="h-3.5 w-3.5 text-slate-500" />
+              <Calendar className="h-3.5 w-3.5 text-slate-400" />
               {formatDateTime(listing.departure_date)}
             </span>
             <span>•</span>
@@ -32,28 +32,28 @@ export default function ListingCard({ listing, isSelected = false }) {
 
       {/* Cargo & Truck Spec Badges */}
       <div className="mt-4 flex flex-wrap gap-1.5 text-xs">
-        <span className="inline-flex items-center gap-1 rounded-lg bg-slate-800 border border-slate-700/60 px-2.5 py-1 text-slate-300 font-medium">
-          <Truck className="h-3 w-3 text-blue-400" />
+        <span className="inline-flex items-center gap-1 rounded-lg bg-slate-100 border border-slate-200 px-2.5 py-1 text-slate-700 font-medium">
+          <Truck className="h-3 w-3 text-blue-600" />
           {listing.truck_type}
         </span>
-        <span className="rounded-lg bg-slate-800 border border-slate-700/60 px-2.5 py-1 text-slate-300 font-medium">
+        <span className="rounded-lg bg-slate-100 border border-slate-200 px-2.5 py-1 text-slate-700 font-medium">
           Cap: {listing.truck_capacity}
         </span>
-        <span className="rounded-lg bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 text-emerald-300 font-semibold">
+        <span className="rounded-lg bg-emerald-50 border border-emerald-200 px-2.5 py-1 text-emerald-700 font-semibold">
           Space: {listing.available_space}
         </span>
       </div>
 
       {/* Driver info & Pricing Footer */}
-      <div className="mt-4 flex items-center justify-between border-t border-slate-800/80 pt-3 text-xs">
+      <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-3 text-xs">
         <div className="flex items-center gap-2">
-          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-600/30 text-blue-400 font-bold text-[10px] border border-blue-500/30">
+          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 text-blue-700 font-bold text-[10px] border border-blue-200">
             {listing.driver?.name?.charAt(0) || 'D'}
           </div>
           <div>
-            <p className="font-semibold text-slate-200">{listing.driver?.name || 'Verified Driver'}</p>
+            <p className="font-semibold text-slate-800">{listing.driver?.name || 'Verified Driver'}</p>
             {listing.driver?.company_name && (
-              <p className="text-[10px] text-slate-400 truncate max-w-[120px]">
+              <p className="text-[10px] text-slate-500 truncate max-w-[120px]">
                 {listing.driver.company_name}
               </p>
             )}
@@ -62,13 +62,13 @@ export default function ListingCard({ listing, isSelected = false }) {
 
         <div className="text-right">
           <div className="flex items-baseline gap-1 justify-end">
-            <span className="text-base font-extrabold text-blue-400 font-display">
+            <span className="text-base font-extrabold text-blue-600 font-display">
               ₹{listing.rate_per_km}
             </span>
-            <span className="text-[10px] text-slate-400">/ km</span>
+            <span className="text-[10px] text-slate-500">/ km</span>
           </div>
           {listing.flat_rate != null && (
-            <p className="text-[10px] font-medium text-emerald-400">
+            <p className="text-[10px] font-medium text-emerald-600">
               or ₹{listing.flat_rate.toLocaleString()} flat
             </p>
           )}

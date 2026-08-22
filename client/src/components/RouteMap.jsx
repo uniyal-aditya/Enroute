@@ -28,7 +28,7 @@ export default function RouteMap({
 }) {
   if (!origin?.lat || !destination?.lat) {
     return (
-      <div className={`flex items-center justify-center rounded-2xl border border-slate-800 bg-slate-900/50 text-slate-500 text-xs ${className}`}>
+      <div className={`flex items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 text-slate-500 text-xs ${className}`}>
         Coordinates unavailable for map visualization
       </div>
     )
@@ -37,7 +37,7 @@ export default function RouteMap({
   const center = [(origin.lat + destination.lat) / 2, (origin.lng + destination.lng) / 2]
 
   return (
-    <div className={`relative overflow-hidden rounded-2xl border border-slate-800 shadow-inner ${className}`}>
+    <div className={`relative overflow-hidden rounded-2xl border border-slate-200 shadow-xs ${className}`}>
       <MapContainer
         center={center}
         zoom={6}
@@ -59,7 +59,7 @@ export default function RouteMap({
             [destination.lat, destination.lng],
           ]}
           pathOptions={{
-            color: '#3b82f6',
+            color: '#2563eb',
             weight: 4,
             dashArray: '8 8',
             opacity: 0.9,
@@ -69,8 +69,8 @@ export default function RouteMap({
         <Marker position={[origin.lat, origin.lng]}>
           <Popup>
             <div className="font-sans">
-              <span className="text-[10px] font-bold uppercase text-emerald-400">Departure</span>
-              <p className="font-bold text-white text-xs">{originLabel || 'Origin'}</p>
+              <span className="text-[10px] font-bold uppercase text-emerald-600">Departure</span>
+              <p className="font-bold text-slate-900 text-xs">{originLabel || 'Origin'}</p>
             </div>
           </Popup>
         </Marker>
@@ -78,8 +78,8 @@ export default function RouteMap({
         <Marker position={[destination.lat, destination.lng]}>
           <Popup>
             <div className="font-sans">
-              <span className="text-[10px] font-bold uppercase text-blue-400">Destination</span>
-              <p className="font-bold text-white text-xs">{destinationLabel || 'Destination'}</p>
+              <span className="text-[10px] font-bold uppercase text-blue-600">Destination</span>
+              <p className="font-bold text-slate-900 text-xs">{destinationLabel || 'Destination'}</p>
             </div>
           </Popup>
         </Marker>

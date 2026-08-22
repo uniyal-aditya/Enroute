@@ -8,8 +8,8 @@ export default function ProtectedRoute({ role }) {
   if (loading) {
     return (
       <div className="flex min-h-[50vh] flex-col items-center justify-center gap-3">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-blue-500 border-t-transparent" />
-        <p className="text-xs text-slate-400">Verifying authentication…</p>
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-blue-600 border-t-transparent" />
+        <p className="text-xs text-slate-500 font-medium">Verifying authentication…</p>
       </div>
     )
   }

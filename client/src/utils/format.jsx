@@ -41,40 +41,40 @@ export function formatDistance(km) {
 
 const STATUS_CONFIGS = {
   ACTIVE: {
-    bg: 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30',
-    dot: 'bg-emerald-400 animate-pulse',
+    bg: 'bg-emerald-50 text-emerald-700 border border-emerald-200',
+    dot: 'bg-emerald-500 animate-pulse',
     label: 'Active Route',
   },
   COMPLETED: {
-    bg: 'bg-slate-700/60 text-slate-300 border border-slate-600/40',
-    dot: 'bg-slate-400',
+    bg: 'bg-slate-100 text-slate-700 border border-slate-200',
+    dot: 'bg-slate-500',
     label: 'Completed',
   },
   CANCELLED: {
-    bg: 'bg-red-500/15 text-red-400 border border-red-500/30',
-    dot: 'bg-red-400',
+    bg: 'bg-red-50 text-red-600 border border-red-200',
+    dot: 'bg-red-500',
     label: 'Cancelled',
   },
   PENDING: {
-    bg: 'bg-amber-500/15 text-amber-300 border border-amber-500/30',
-    dot: 'bg-amber-400 animate-pulse',
+    bg: 'bg-amber-50 text-amber-800 border border-amber-200',
+    dot: 'bg-amber-500 animate-pulse',
     label: 'Review Pending',
   },
   CONFIRMED: {
-    bg: 'bg-blue-500/15 text-blue-300 border border-blue-500/30',
-    dot: 'bg-blue-400',
+    bg: 'bg-blue-50 text-blue-700 border border-blue-200',
+    dot: 'bg-blue-600',
     label: 'Booking Confirmed',
   },
   REJECTED: {
-    bg: 'bg-red-500/15 text-red-400 border border-red-500/30',
-    dot: 'bg-red-400',
+    bg: 'bg-red-50 text-red-700 border border-red-200',
+    dot: 'bg-red-500',
     label: 'Request Declined',
   },
 }
 
 export function StatusBadge({ status, showDot = true, className = '' }) {
   const config = STATUS_CONFIGS[status] || {
-    bg: 'bg-slate-800 text-slate-400 border border-slate-700',
+    bg: 'bg-slate-100 text-slate-700 border border-slate-200',
     dot: 'bg-slate-400',
     label: status,
   }

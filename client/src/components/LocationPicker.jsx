@@ -39,13 +39,13 @@ export default function LocationPicker({ label, value, onChange }) {
       <div className="flex items-center justify-between">
         <label className="label mb-0">{label}</label>
         {value && (
-          <span className="text-[10px] text-blue-400 font-mono">
+          <span className="text-[10px] text-blue-600 font-mono font-bold">
             {value.lat.toFixed(4)}, {value.lng.toFixed(4)}
           </span>
         )}
       </div>
 
-      <div className="relative h-48 overflow-hidden rounded-xl border border-slate-700/80 bg-slate-950 shadow-inner">
+      <div className="relative h-48 overflow-hidden rounded-xl border border-slate-200 bg-slate-100 shadow-inner">
         <MapContainer center={value ? [value.lat, value.lng] : [28.6139, 77.2090]} zoom={value ? 7 : 5} className="h-full w-full z-0">
           <TileLayer
             url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
@@ -56,9 +56,9 @@ export default function LocationPicker({ label, value, onChange }) {
           {value && <CenterUpdater center={value} />}
         </MapContainer>
 
-        <div className="pointer-events-none absolute bottom-2 left-2 right-2 flex items-center justify-between rounded-lg bg-slate-900/90 px-2.5 py-1 text-[11px] text-slate-300 backdrop-blur border border-slate-700/60 z-[400]">
-          <span className="flex items-center gap-1">
-            <MapPin className="h-3 w-3 text-blue-400" />
+        <div className="pointer-events-none absolute bottom-2 left-2 right-2 flex items-center justify-between rounded-lg bg-white/95 px-2.5 py-1 text-[11px] text-slate-700 backdrop-blur border border-slate-200 shadow-sm z-[400]">
+          <span className="flex items-center gap-1 font-medium">
+            <MapPin className="h-3 w-3 text-blue-600" />
             {value ? 'Pin selected' : 'Click on map or select preset below'}
           </span>
         </div>
@@ -71,7 +71,7 @@ export default function LocationPicker({ label, value, onChange }) {
             key={city.name}
             type="button"
             onClick={() => onChange({ lat: city.lat, lng: city.lng })}
-            className="rounded-lg border border-slate-800 bg-slate-900/80 px-2 py-0.5 text-[10px] font-medium text-slate-400 hover:border-blue-500/40 hover:text-blue-300 transition"
+            className="rounded-lg border border-slate-200 bg-white px-2 py-0.5 text-[10px] font-medium text-slate-600 hover:border-blue-300 hover:text-blue-700 hover:bg-blue-50/50 shadow-xs transition"
           >
             {city.name}
           </button>

@@ -159,11 +159,11 @@ function CreateListingForm({ onCreated }) {
           onClick={autoDistance}
           className="btn-secondary !py-2 text-xs font-semibold"
         >
-          <Sparkles className="h-3.5 w-3.5 text-blue-400" />
+          <Sparkles className="h-3.5 w-3.5 text-blue-600" />
           Auto-Calculate Distance from Pins
         </button>
         {form.distance_km && (
-          <span className="text-xs font-mono text-emerald-400 font-semibold">
+          <span className="text-xs font-mono text-emerald-700 font-bold">
             {form.distance_km} km calculated
           </span>
         )}
@@ -304,9 +304,9 @@ function MyListings({ listings, onRefresh }) {
   if (listings.length === 0) {
     return (
       <div className="card p-12 text-center space-y-3">
-        <Truck className="mx-auto h-12 w-12 text-slate-600" />
-        <h3 className="text-base font-bold text-white">You haven't listed any routes yet</h3>
-        <p className="text-xs text-slate-400 max-w-sm mx-auto">
+        <Truck className="mx-auto h-12 w-12 text-slate-400" />
+        <h3 className="text-base font-bold text-slate-900">You haven't listed any routes yet</h3>
+        <p className="text-xs text-slate-500 max-w-sm mx-auto">
           Publish your upcoming journeys to turn empty backhauls and unused truck capacity into steady earnings.
         </p>
       </div>
@@ -316,39 +316,39 @@ function MyListings({ listings, onRefresh }) {
   return (
     <div className="space-y-3.5">
       {listings.map((l) => (
-        <div key={l.id} className="card p-5 space-y-4 hover:border-slate-700 transition">
+        <div key={l.id} className="card p-5 space-y-4 hover:border-slate-300 transition">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
-              <div className="flex items-center gap-2 text-base font-bold text-white">
+              <div className="flex items-center gap-2 text-base font-bold text-slate-900">
                 <span>{l.origin}</span>
-                <ArrowRight className="h-4 w-4 text-blue-400 shrink-0" />
+                <ArrowRight className="h-4 w-4 text-blue-600 shrink-0" />
                 <span>{l.destination}</span>
               </div>
-              <div className="flex items-center gap-2 text-xs text-slate-400 mt-1">
+              <div className="flex items-center gap-2 text-xs text-slate-500 mt-1">
                 <span>Departs {formatDateTime(l.departure_date)}</span>
                 <span>•</span>
                 <span>{Math.round(l.distance_km)} km</span>
                 <span>•</span>
-                <span className="text-blue-400 font-semibold font-display">₹{l.rate_per_km}/km</span>
+                <span className="text-blue-600 font-semibold font-display">₹{l.rate_per_km}/km</span>
               </div>
             </div>
             <StatusBadge status={l.status} />
           </div>
 
           <div className="flex flex-wrap items-center gap-2 text-xs">
-            <span className="rounded-lg bg-slate-800 px-2.5 py-1 text-slate-300">
+            <span className="rounded-lg bg-slate-100 px-2.5 py-1 text-slate-700">
               {l.truck_type} ({l.truck_capacity})
             </span>
-            <span className="rounded-lg bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 text-emerald-300 font-semibold">
+            <span className="rounded-lg bg-emerald-50 border border-emerald-200 px-2.5 py-1 text-emerald-700 font-semibold">
               Available: {l.available_space}
             </span>
             <span className="text-slate-500 font-mono">Contact: {l.contact_phone}</span>
           </div>
 
-          <div className="flex items-center justify-between border-t border-slate-800 pt-3 text-xs">
+          <div className="flex items-center justify-between border-t border-slate-100 pt-3 text-xs">
             <Link
               to={`/routes/${l.id}`}
-              className="text-blue-400 hover:text-blue-300 font-semibold flex items-center gap-1"
+              className="text-blue-600 hover:text-blue-700 font-semibold flex items-center gap-1"
             >
               Preview Public Page <ArrowRight className="h-3 w-3" />
             </Link>
@@ -382,9 +382,9 @@ function BookingRequests({ requests, onRefresh }) {
   if (requests.length === 0) {
     return (
       <div className="card p-12 text-center space-y-3">
-        <Package className="mx-auto h-12 w-12 text-slate-600" />
-        <h3 className="text-base font-bold text-white">No incoming booking requests yet</h3>
-        <p className="text-xs text-slate-400 max-w-sm mx-auto">
+        <Package className="mx-auto h-12 w-12 text-slate-400" />
+        <h3 className="text-base font-bold text-slate-900">No incoming booking requests yet</h3>
+        <p className="text-xs text-slate-500 max-w-sm mx-auto">
           When customers request cargo space on your listed routes, they will appear here with cargo details and contact actions.
         </p>
       </div>
@@ -397,42 +397,42 @@ function BookingRequests({ requests, onRefresh }) {
         <div
           key={b.id}
           className={`card p-5 space-y-4 ${
-            b.status === 'PENDING' ? 'border-amber-500/30 bg-slate-850' : ''
+            b.status === 'PENDING' ? 'border-amber-200 bg-amber-50/30' : ''
           }`}
         >
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-xs font-mono font-bold text-blue-400">Request #{b.id}</span>
+                <span className="text-xs font-mono font-bold text-blue-600">Request #{b.id}</span>
                 <span className="text-xs text-slate-400">•</span>
-                <span className="text-xs font-semibold text-slate-200">
+                <span className="text-xs font-semibold text-slate-800">
                   {b.customer?.name || `Customer #${b.customer_id}`}
                 </span>
                 {b.customer?.company_name && (
-                  <span className="text-[10px] text-slate-400">({b.customer.company_name})</span>
+                  <span className="text-[10px] text-slate-500">({b.customer.company_name})</span>
                 )}
               </div>
-              <p className="text-xs text-slate-400 mt-1">
-                Route: <strong className="text-white">{b.route?.origin} → {b.route?.destination}</strong> · Requested {formatDateTime(b.created_at)}
+              <p className="text-xs text-slate-500 mt-1">
+                Route: <strong className="text-slate-900">{b.route?.origin} → {b.route?.destination}</strong> · Requested {formatDateTime(b.created_at)}
               </p>
             </div>
             <StatusBadge status={b.status} />
           </div>
 
           {/* Details grid */}
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 rounded-xl bg-slate-950 p-4 border border-slate-800 text-xs">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 rounded-xl bg-slate-50 p-4 border border-slate-200 text-xs">
             <div>
               <span className="text-[10px] uppercase font-bold text-slate-500">Pickup Location</span>
-              <p className="text-slate-200 mt-0.5">{b.pickup_location}</p>
+              <p className="text-slate-800 mt-0.5">{b.pickup_location}</p>
             </div>
             <div>
               <span className="text-[10px] uppercase font-bold text-slate-500">Drop-off Location</span>
-              <p className="text-slate-200 mt-0.5">{b.drop_location}</p>
+              <p className="text-slate-800 mt-0.5">{b.drop_location}</p>
             </div>
-            <div className="sm:col-span-2 border-t border-slate-800/80 pt-2">
+            <div className="sm:col-span-2 border-t border-slate-200 pt-2">
               <span className="text-[10px] uppercase font-bold text-slate-500">Cargo / Goods</span>
-              <p className="text-white font-medium mt-0.5">{b.goods_description}</p>
-              <span className="inline-block mt-1 text-[11px] font-semibold text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded">
+              <p className="text-slate-900 font-medium mt-0.5">{b.goods_description}</p>
+              <span className="inline-block mt-1 text-[11px] font-semibold text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
                 Weight: {b.estimated_weight}
               </span>
             </div>
@@ -460,14 +460,14 @@ function BookingRequests({ requests, onRefresh }) {
 
           {/* Confirmed Direct Contact Actions */}
           {b.status === 'CONFIRMED' && (
-            <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3.5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+            <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-3.5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
               <div className="space-y-0.5">
-                <span className="font-bold text-emerald-300 flex items-center gap-1.5">
-                  <CheckCircle2 className="h-4 w-4" />
+                <span className="font-bold text-emerald-800 flex items-center gap-1.5">
+                  <CheckCircle2 className="h-4 w-4 text-emerald-600" />
                   Booking Confirmed — Coordinate Pickup Directly
                 </span>
-                <p className="text-[11px] text-slate-300">
-                  Customer Phone: <span className="font-mono font-bold text-white">{b.customer_phone || b.customer?.phone}</span>
+                <p className="text-[11px] text-slate-600">
+                  Customer Phone: <span className="font-mono font-bold text-slate-900">{b.customer_phone || b.customer?.phone}</span>
                 </p>
               </div>
 
@@ -546,11 +546,11 @@ export default function DriverDashboard() {
       {/* Dashboard Top Banner */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-white">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
             Driver Command Center
           </h1>
-          <p className="text-xs sm:text-sm text-slate-400 mt-0.5">
-            Welcome back, <strong className="text-white">{user?.name}</strong>. Monetize your truck's spare space and manage shipments.
+          <p className="text-xs sm:text-sm text-slate-600 mt-0.5">
+            Welcome back, <strong className="text-slate-900">{user?.name}</strong>. Monetize your truck's spare space and manage shipments.
           </p>
         </div>
 
@@ -566,42 +566,42 @@ export default function DriverDashboard() {
       {/* KPI Stats Cards */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <div className="card p-4 space-y-1">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
             Active Routes
           </span>
-          <div className="text-2xl font-black text-white font-display">{activeListingsCount}</div>
-          <p className="text-[10px] text-emerald-400">Live on marketplace</p>
+          <div className="text-2xl font-black text-slate-900 font-display">{activeListingsCount}</div>
+          <p className="text-[10px] text-emerald-600 font-semibold">Live on marketplace</p>
         </div>
 
-        <div className="card p-4 space-y-1 border-amber-500/30">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+        <div className="card p-4 space-y-1 border-amber-200 bg-amber-50/40">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-amber-800">
             Pending Requests
           </span>
-          <div className="text-2xl font-black text-amber-400 font-display">{pendingCount}</div>
-          <p className="text-[10px] text-amber-400">Awaiting your approval</p>
+          <div className="text-2xl font-black text-amber-700 font-display">{pendingCount}</div>
+          <p className="text-[10px] text-amber-700 font-semibold">Awaiting your approval</p>
         </div>
 
-        <div className="card p-4 space-y-1 border-emerald-500/30">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+        <div className="card p-4 space-y-1 border-emerald-200 bg-emerald-50/40">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800">
             Confirmed Deliveries
           </span>
-          <div className="text-2xl font-black text-emerald-400 font-display">{confirmedCount}</div>
-          <p className="text-[10px] text-emerald-400">Ready for pickup/drop</p>
+          <div className="text-2xl font-black text-emerald-700 font-display">{confirmedCount}</div>
+          <p className="text-[10px] text-emerald-700 font-semibold">Ready for pickup/drop</p>
         </div>
 
         <div className="card p-4 space-y-1">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
             Vehicle Specs
           </span>
-          <div className="text-sm font-bold text-slate-200 truncate">
+          <div className="text-sm font-bold text-slate-800 truncate">
             {user?.truck_type || 'Tata 407'}
           </div>
-          <p className="text-[10px] text-blue-400">{user?.truck_capacity || '2.5 Tons'} cap</p>
+          <p className="text-[10px] text-blue-600 font-semibold">{user?.truck_capacity || '2.5 Tons'} cap</p>
         </div>
       </div>
 
       {/* Navigation Tabs */}
-      <div className="flex border-b border-slate-800 gap-2 pb-px overflow-x-auto">
+      <div className="flex border-b border-slate-200 gap-2 pb-px overflow-x-auto">
         {TABS.map((t) => {
           const Icon = t.icon
           const isActive = tab === t.id
@@ -611,8 +611,8 @@ export default function DriverDashboard() {
               onClick={() => setTab(t.id)}
               className={`flex items-center gap-2 px-4 py-2.5 text-xs font-bold rounded-t-xl transition border-b-2 whitespace-nowrap ${
                 isActive
-                  ? 'border-blue-500 text-blue-400 bg-slate-800/40'
-                  : 'border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-850'
+                  ? 'border-blue-600 text-blue-700 bg-blue-50/60'
+                  : 'border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-100'
               }`}
             >
               <Icon className="h-4 w-4" />
@@ -630,8 +630,8 @@ export default function DriverDashboard() {
       {/* Tab Content */}
       <div className="pt-2">
         {loading ? (
-          <div className="py-16 text-center space-y-2 text-slate-400 text-xs">
-            <div className="h-8 w-8 mx-auto animate-spin rounded-full border-2 border-blue-500 border-t-transparent" />
+          <div className="py-16 text-center space-y-2 text-slate-500 text-xs">
+            <div className="h-8 w-8 mx-auto animate-spin rounded-full border-2 border-blue-600 border-t-transparent" />
             <p>Loading your routes and requests…</p>
           </div>
         ) : (

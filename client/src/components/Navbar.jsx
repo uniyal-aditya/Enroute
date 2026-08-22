@@ -26,21 +26,21 @@ export default function Navbar() {
   }
 
   const linkClass = ({ isActive }) =>
-    `flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-semibold transition-all duration-150 ${
+    `flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all duration-150 ${
       isActive
-        ? 'bg-blue-600/20 text-blue-400 border border-blue-500/30 shadow-sm'
-        : 'text-slate-300 hover:text-white hover:bg-slate-800/80'
+        ? 'bg-blue-50 text-blue-700 border border-blue-200 shadow-sm'
+        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
     }`
 
   const mobileLinkClass = ({ isActive }) =>
     `flex items-center gap-2.5 px-4 py-3 rounded-xl text-sm font-semibold transition-all ${
       isActive
-        ? 'bg-blue-600/20 text-blue-400 border border-blue-500/30'
-        : 'text-slate-300 hover:text-white hover:bg-slate-800'
+        ? 'bg-blue-50 text-blue-700 border border-blue-200'
+        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
     }`
 
   return (
-    <header className="sticky top-0 z-50 border-b border-slate-800/90 bg-[#090e1a]/95 backdrop-blur-md">
+    <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur-md shadow-xs">
       <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Brand Logo */}
         <Link 
@@ -48,15 +48,15 @@ export default function Navbar() {
           className="flex items-center gap-3 group"
           onClick={() => setMobileMenuOpen(false)}
         >
-          <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 p-2 shadow-lg shadow-blue-500/20 ring-1 ring-white/20 transition duration-200 group-hover:scale-105">
-            <img src="/favicon-32x32.png" alt="Enroute" className="h-6 w-6 object-contain" />
+          <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 p-2 shadow-md shadow-blue-500/20 transition duration-200 group-hover:scale-105">
+            <img src="/favicon-32x32.png" alt="Enroute" className="h-6 w-6 object-contain brightness-0 invert" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-xl font-display font-black tracking-tight text-white">
+              <span className="text-xl font-display font-black tracking-tight text-slate-900">
                 ENROUTE
               </span>
-              <span className="hidden rounded-full bg-blue-500/10 px-2 py-0.5 text-[10px] font-bold tracking-wider text-blue-400 border border-blue-500/20 md:inline-block">
+              <span className="hidden rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-bold tracking-wider text-blue-700 border border-blue-200 md:inline-block">
                 SIH 2026
               </span>
             </div>
@@ -96,14 +96,14 @@ export default function Navbar() {
             <div className="flex items-center gap-3">
               <Link
                 to="/profile"
-                className="flex items-center gap-2.5 rounded-xl border border-slate-700/80 bg-slate-800/80 px-3 py-1.5 transition hover:border-slate-600 hover:bg-slate-750"
+                className="flex items-center gap-2.5 rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 transition hover:border-slate-300 hover:bg-slate-100"
               >
                 <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-600 font-bold text-white text-xs">
                   {user.name?.charAt(0).toUpperCase() || 'U'}
                 </div>
                 <div className="text-left">
-                  <p className="text-xs font-bold leading-tight text-slate-200">{user.name}</p>
-                  <p className="text-[10px] font-medium text-slate-400 capitalize">
+                  <p className="text-xs font-bold leading-tight text-slate-900">{user.name}</p>
+                  <p className="text-[10px] font-medium text-slate-500 capitalize">
                     {user.role?.toLowerCase()}
                   </p>
                 </div>
@@ -111,7 +111,7 @@ export default function Navbar() {
               
               <button
                 onClick={handleLogout}
-                className="flex items-center gap-1.5 rounded-xl border border-slate-700/80 bg-slate-800/60 px-3 py-2 text-xs font-semibold text-slate-300 hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/30 transition"
+                className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-600 hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition"
                 title="Log Out"
               >
                 <LogOut className="h-3.5 w-3.5" />
@@ -122,14 +122,14 @@ export default function Navbar() {
             <div className="flex items-center gap-2">
               <Link
                 to="/login"
-                className="flex items-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800/60 px-3.5 py-2 text-xs font-semibold text-slate-200 hover:bg-slate-700/80 hover:text-white transition"
+                className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition"
               >
                 <LogIn className="h-3.5 w-3.5" />
                 Sign In
               </Link>
               <Link
                 to="/register"
-                className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-2 text-xs font-bold text-white shadow-md shadow-blue-600/20 hover:from-blue-500 hover:to-indigo-500 transition"
+                className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-2 text-xs font-bold text-white shadow-md shadow-blue-600/20 hover:from-blue-700 hover:to-indigo-700 transition"
               >
                 Get Started
               </Link>
@@ -140,7 +140,7 @@ export default function Navbar() {
         {/* Mobile Menu Button */}
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-800 bg-slate-900 text-slate-400 hover:text-white md:hidden"
+          className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 hover:text-slate-900 md:hidden"
           aria-label="Toggle menu"
         >
           {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -149,7 +149,7 @@ export default function Navbar() {
 
       {/* Mobile Drawer Menu */}
       {mobileMenuOpen && (
-        <div className="border-b border-slate-800 bg-[#090e1a] px-4 py-4 md:hidden animate-fade-in space-y-3">
+        <div className="border-b border-slate-200 bg-white px-4 py-4 md:hidden animate-fade-in space-y-3 shadow-lg">
           <nav className="space-y-1">
             <NavLink to="/" end className={mobileLinkClass} onClick={() => setMobileMenuOpen(false)}>
               Home
@@ -181,16 +181,16 @@ export default function Navbar() {
             )}
           </nav>
 
-          <div className="border-t border-slate-800 pt-3">
+          <div className="border-t border-slate-200 pt-3">
             {user ? (
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-bold text-white">{user.name}</p>
-                  <p className="text-xs text-slate-400 capitalize">{user.role?.toLowerCase()}</p>
+                  <p className="text-sm font-bold text-slate-900">{user.name}</p>
+                  <p className="text-xs text-slate-500 capitalize">{user.role?.toLowerCase()}</p>
                 </div>
                 <button
                   onClick={handleLogout}
-                  className="flex items-center gap-1.5 rounded-lg bg-red-500/10 px-3 py-1.5 text-xs font-semibold text-red-400 border border-red-500/20"
+                  className="flex items-center gap-1.5 rounded-lg bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-600 border border-red-200"
                 >
                   <LogOut className="h-3.5 w-3.5" />
                   Logout
