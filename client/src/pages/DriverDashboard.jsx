@@ -301,7 +301,9 @@ function MyListings({ listings, onRefresh }) {
     }
   }
 
-  if (listings.length === 0) {
+  const list = Array.isArray(listings) ? listings : []
+
+  if (list.length === 0) {
     return (
       <div className="card p-12 text-center space-y-3">
         <Truck className="mx-auto h-12 w-12 text-slate-400" />
@@ -315,7 +317,7 @@ function MyListings({ listings, onRefresh }) {
 
   return (
     <div className="space-y-3.5">
-      {listings.map((l) => (
+      {list.map((l) => (
         <div key={l.id} className="card p-5 space-y-4 hover:border-slate-300 transition">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
@@ -379,7 +381,9 @@ function BookingRequests({ requests, onRefresh }) {
     }
   }
 
-  if (requests.length === 0) {
+  const reqList = Array.isArray(requests) ? requests : []
+
+  if (reqList.length === 0) {
     return (
       <div className="card p-12 text-center space-y-3">
         <Package className="mx-auto h-12 w-12 text-slate-400" />
@@ -393,7 +397,7 @@ function BookingRequests({ requests, onRefresh }) {
 
   return (
     <div className="space-y-4">
-      {requests.map((b) => (
+      {reqList.map((b) => (
         <div
           key={b.id}
           className={`card p-5 space-y-4 ${
@@ -515,10 +519,14 @@ export default function DriverDashboard() {
       api.get('/bookings/driver-requests'),
     ])
       .then(([lRes, rRes]) => {
-        setListings(lRes.data)
-        setRequests(rRes.data)
+        setListings(Array.isArray(lRes.data) ? lRes.data : [])
+        setRequests(Array.isArray(rRes.data) ? rRes.data : [])
       })
-      .catch((err) => toast.error(getApiError(err, 'Failed to load driver dashboard')))
+      .catch((err) => {
+        setListings([])
+        setRequests([])
+        toast.error(getApiError(err, 'Failed to load driver dashboard'))
+      })
       .finally(() => setLoading(false))
   }
 
@@ -526,16 +534,19 @@ export default function DriverDashboard() {
     loadData()
   }, [])
 
-  const pendingCount = requests.filter((r) => r.status === 'PENDING').length
-  const confirmedCount = requests.filter((r) => r.status === 'CONFIRMED').length
-  const activeListingsCount = listings.filter((l) => l.status === 'ACTIVE').length
+  const safeRequests = Array.isArray(requests) ? requests : []
+  const safeListings = Array.isArray(listings) ? listings : []
+
+  const pendingCount = safeRequests.filter((r) => r.status === 'PENDING').length
+  const confirmedCount = safeRequests.filter((r) => r.status === 'CONFIRMED').length
+  const activeListingsCount = safeListings.filter((l) => l.status === 'ACTIVE').length
 
   const TABS = [
-    { id: 'listings', label: `My Routes (${listings.length})`, icon: Truck },
+    { id: 'listings', label: `My Routes (${safeListings.length})`, icon: Truck },
     { id: 'new', label: 'Create New Route', icon: PlusCircle },
     { 
       id: 'requests', 
-      label: `Booking Requests (${requests.length})`, 
+      label: `Booking Requests (${safeRequests.length})`, 
       icon: Package,
       badge: pendingCount > 0 ? pendingCount : null,
     },
@@ -636,7 +647,7 @@ export default function DriverDashboard() {
           </div>
         ) : (
           <>
-            {tab === 'listings' && <MyListings listings={listings} onRefresh={loadData} />}
+            {tab === 'listings' && <MyListings listings={safeListings} onRefresh={loadData} />}
             {tab === 'new' && (
               <div className="card p-6 sm:p-8">
                 <CreateListingForm
@@ -647,7 +658,7 @@ export default function DriverDashboard() {
                 />
               </div>
             )}
-            {tab === 'requests' && <BookingRequests requests={requests} onRefresh={loadData} />}
+            {tab === 'requests' && <BookingRequests requests={safeRequests} onRefresh={loadData} />}
           </>
         )}
       </div>

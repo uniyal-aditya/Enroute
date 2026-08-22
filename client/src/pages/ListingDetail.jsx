@@ -141,7 +141,8 @@ export default function ListingDetail() {
     api
       .get('/bookings/my-bookings')
       .then((res) => {
-        const found = res.data.find((b) => b.route_id === Number(id))
+        const bookingsList = Array.isArray(res.data) ? res.data : []
+        const found = bookingsList.find((b) => b.route_id === Number(id))
         setMyBooking(found || null)
       })
       .catch(() => setMyBooking(null))

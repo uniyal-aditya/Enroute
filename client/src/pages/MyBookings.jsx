@@ -31,8 +31,11 @@ export default function MyBookings() {
     setLoading(true)
     api
       .get('/bookings/my-bookings')
-      .then((res) => setBookings(res.data))
-      .catch((err) => toast.error(getApiError(err, 'Could not load your shipments')))
+      .then((res) => setBookings(Array.isArray(res.data) ? res.data : []))
+      .catch((err) => {
+        setBookings([])
+        toast.error(getApiError(err, 'Could not load your shipments'))
+      })
       .finally(() => setLoading(false))
   }
 
@@ -40,9 +43,10 @@ export default function MyBookings() {
     loadBookings()
   }, [])
 
-  const pending = bookings.filter((b) => b.status === 'PENDING').length
-  const confirmed = bookings.filter((b) => b.status === 'CONFIRMED').length
-  const completed = bookings.filter((b) => b.status === 'COMPLETED').length
+  const safeBookings = Array.isArray(bookings) ? bookings : []
+  const pending = safeBookings.filter((b) => b.status === 'PENDING').length
+  const confirmed = safeBookings.filter((b) => b.status === 'CONFIRMED').length
+  const completed = safeBookings.filter((b) => b.status === 'COMPLETED').length
 
   return (
     <div className="space-y-6 py-4">
@@ -69,7 +73,7 @@ export default function MyBookings() {
           <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
             Total Requests
           </span>
-          <div className="text-2xl font-black text-slate-900 font-display">{bookings.length}</div>
+          <div className="text-2xl font-black text-slate-900 font-display">{safeBookings.length}</div>
           <p className="text-[10px] text-slate-500">All submitted shipments</p>
         </div>
 
@@ -105,7 +109,7 @@ export default function MyBookings() {
             <div className="h-8 w-8 mx-auto animate-spin rounded-full border-2 border-blue-600 border-t-transparent" />
             <p>Loading your shipment requests…</p>
           </div>
-        ) : bookings.length === 0 ? (
+        ) : safeBookings.length === 0 ? (
           <div className="card p-12 text-center space-y-4">
             <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 text-slate-400">
               <Package className="h-7 w-7" />
@@ -122,7 +126,7 @@ export default function MyBookings() {
             </Link>
           </div>
         ) : (
-          bookings.map((b) => (
+          safeBookings.map((b) => (
             <div
               key={b.id}
               className={`card p-5 space-y-4 transition ${

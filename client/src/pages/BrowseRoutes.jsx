@@ -48,9 +48,10 @@ export default function BrowseRoutes() {
     api
       .get('/routes/', { params })
       .then((res) => {
-        setListings(res.data)
-        if (res.data.length > 0) {
-          setSelectedRoute(res.data[0])
+        const data = Array.isArray(res.data) ? res.data : []
+        setListings(data)
+        if (data.length > 0) {
+          setSelectedRoute(data[0])
         } else {
           setSelectedRoute(null)
         }
@@ -69,6 +70,8 @@ export default function BrowseRoutes() {
     setFilters(EMPTY_FILTERS)
     setSearchParams({})
   }
+
+  const listingsList = Array.isArray(listings) ? listings : []
 
   return (
     <div className="space-y-6 py-2">
@@ -170,7 +173,7 @@ export default function BrowseRoutes() {
         {/* Left Column: Route Cards */}
         <div className={`lg:col-span-6 space-y-3.5 ${mobileView === 'map' ? 'hidden lg:block' : 'block'}`}>
           <div className="flex items-center justify-between text-xs text-slate-500 px-1">
-            <span>Showing <strong className="text-slate-900">{listings.length}</strong> active routes</span>
+            <span>Showing <strong className="text-slate-900">{listingsList.length}</strong> active routes</span>
             <span>Click any route to preview route map</span>
           </div>
 
@@ -184,7 +187,7 @@ export default function BrowseRoutes() {
                 </div>
               ))}
             </div>
-          ) : listings.length === 0 ? (
+          ) : listingsList.length === 0 ? (
             <div className="card p-10 text-center space-y-3">
               <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-100 text-slate-500">
                 <Search className="h-6 w-6" />
@@ -199,7 +202,7 @@ export default function BrowseRoutes() {
             </div>
           ) : (
             <div className="space-y-3">
-              {listings.map((listing) => (
+              {listingsList.map((listing) => (
                 <div
                   key={listing.id}
                   onClick={() => setSelectedRoute(listing)}

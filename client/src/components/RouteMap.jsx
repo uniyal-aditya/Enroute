@@ -7,12 +7,17 @@ import '../utils/mapIcons.js'
 function MapBoundsAdjuster({ origin, destination }) {
   const map = useMap()
   useEffect(() => {
-    if (origin?.lat && destination?.lat) {
-      const bounds = L.latLngBounds(
-        [origin.lat, origin.lng],
-        [destination.lat, destination.lng]
-      )
-      map.fitBounds(bounds, { padding: [40, 40], maxZoom: 11 })
+    const oLat = Number(origin?.lat)
+    const oLng = Number(origin?.lng)
+    const dLat = Number(destination?.lat)
+    const dLng = Number(destination?.lng)
+    if (!isNaN(oLat) && !isNaN(oLng) && !isNaN(dLat) && !isNaN(dLng)) {
+      try {
+        const bounds = L.latLngBounds([oLat, oLng], [dLat, dLng])
+        map.fitBounds(bounds, { padding: [40, 40], maxZoom: 11 })
+      } catch (e) {
+        console.warn('Leaflet fitBounds error:', e)
+      }
     }
   }, [map, origin, destination])
   return null
@@ -26,7 +31,12 @@ export default function RouteMap({
   className = 'h-72',
   interactive = true,
 }) {
-  if (!origin?.lat || !destination?.lat) {
+  const oLat = Number(origin?.lat)
+  const oLng = Number(origin?.lng)
+  const dLat = Number(destination?.lat)
+  const dLng = Number(destination?.lng)
+
+  if (isNaN(oLat) || isNaN(oLng) || isNaN(dLat) || isNaN(dLng)) {
     return (
       <div className={`flex items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 text-slate-500 text-xs ${className}`}>
         Coordinates unavailable for map visualization
@@ -34,7 +44,7 @@ export default function RouteMap({
     )
   }
 
-  const center = [(origin.lat + destination.lat) / 2, (origin.lng + destination.lng) / 2]
+  const center = [(oLat + dLat) / 2, (oLng + dLng) / 2]
 
   return (
     <div className={`relative overflow-hidden rounded-2xl border border-slate-200 shadow-xs ${className}`}>
@@ -55,8 +65,8 @@ export default function RouteMap({
         {/* Animated route polyline */}
         <Polyline
           positions={[
-            [origin.lat, origin.lng],
-            [destination.lat, destination.lng],
+            [oLat, oLng],
+            [dLat, dLng],
           ]}
           pathOptions={{
             color: '#2563eb',
@@ -66,7 +76,7 @@ export default function RouteMap({
           }}
         />
 
-        <Marker position={[origin.lat, origin.lng]}>
+        <Marker position={[oLat, oLng]}>
           <Popup>
             <div className="font-sans">
               <span className="text-[10px] font-bold uppercase text-emerald-600">Departure</span>
@@ -75,7 +85,7 @@ export default function RouteMap({
           </Popup>
         </Marker>
 
-        <Marker position={[destination.lat, destination.lng]}>
+        <Marker position={[dLat, dLng]}>
           <Popup>
             <div className="font-sans">
               <span className="text-[10px] font-bold uppercase text-blue-600">Destination</span>
@@ -84,7 +94,7 @@ export default function RouteMap({
           </Popup>
         </Marker>
 
-        <MapBoundsAdjuster origin={origin} destination={destination} />
+        <MapBoundsAdjuster origin={{ lat: oLat, lng: oLng }} destination={{ lat: dLat, lng: dLng }} />
       </MapContainer>
     </div>
   )

@@ -26,7 +26,13 @@ export default function Home() {
   useEffect(() => {
     api
       .get('/routes/')
-      .then((res) => setFeaturedRoutes(res.data.slice(0, 4)))
+      .then((res) => {
+        if (Array.isArray(res.data)) {
+          setFeaturedRoutes(res.data.slice(0, 4))
+        } else {
+          setFeaturedRoutes([])
+        }
+      })
       .catch(() => setFeaturedRoutes([]))
       .finally(() => setLoading(false))
   }, [])
@@ -38,6 +44,8 @@ export default function Home() {
     if (quickSearch.destination) query.set('destination', quickSearch.destination)
     navigate(`/routes?${query.toString()}`)
   }
+
+  const routesList = Array.isArray(featuredRoutes) ? featuredRoutes : []
 
   return (
     <div className="space-y-16 py-4 sm:space-y-24">
@@ -263,7 +271,7 @@ export default function Home() {
           </div>
 
           <Link to="/routes" className="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1">
-            Browse all routes ({featuredRoutes.length}+)
+            Browse all routes ({routesList.length}+)
             <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         </div>
@@ -278,13 +286,13 @@ export default function Home() {
               </div>
             ))}
           </div>
-        ) : featuredRoutes.length === 0 ? (
+        ) : routesList.length === 0 ? (
           <div className="card p-8 text-center text-slate-500 text-sm">
             No live routes found. Be the first driver to post a route!
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {featuredRoutes.map((listing) => (
+            {routesList.map((listing) => (
               <ListingCard key={listing.id} listing={listing} />
             ))}
           </div>
