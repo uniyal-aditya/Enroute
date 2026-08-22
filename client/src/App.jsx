@@ -10,6 +10,7 @@ import Register from './pages/Register.jsx'
 import DriverDashboard from './pages/DriverDashboard.jsx'
 import MyBookings from './pages/MyBookings.jsx'
 import Profile from './pages/Profile.jsx'
+import HornOkRadio from './pages/HornOkRadio.jsx'
 import { AlertCircle, ArrowLeft } from 'lucide-react'
 
 function NotFound() {
@@ -43,6 +44,8 @@ export default function App() {
           <Route path="/listings/:id" element={<ListingDetail />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/horn-ok-please" element={<HornOkRadio />} />
+          <Route path="/driver/radio" element={<HornOkRadio />} />
 
           {/* Customer Protected Routes */}
           <Route element={<ProtectedRoute role="CUSTOMER" />}>

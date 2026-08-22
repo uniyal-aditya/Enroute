@@ -17,9 +17,12 @@ export default function Footer() {
               <span className="text-xl font-display font-extrabold tracking-tight text-slate-900">
                 ENROUTE
               </span>
+              <span className="rounded-full bg-blue-50 border border-blue-200 px-2 py-0.5 text-[10px] font-bold text-blue-700">
+                Move Freight, Not Air
+              </span>
             </div>
             <p className="max-w-md text-sm text-slate-600 leading-relaxed">
-              Enroute connects cargo senders with trucks already heading their way. Monetize unused vehicle space, reduce empty backhauls, and make intercity goods delivery 40–60% more affordable.
+              Enroute connects cargo senders with trucks already heading their way. Move freight, not air — monetize unused vehicle space, eliminate empty backhauls, and make intercity goods delivery 40–60% more affordable.
             </p>
             <div className="inline-flex items-center gap-2 rounded-xl bg-slate-50 border border-slate-200 px-3.5 py-2 text-xs text-slate-700">
               <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>

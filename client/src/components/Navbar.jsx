@@ -64,8 +64,8 @@ export default function Navbar() {
                 SIH 2026
               </span>
             </div>
-            <span className="hidden text-[10px] uppercase font-bold tracking-widest text-slate-400 sm:block -mt-1">
-              Shared Freight Logistics
+            <span className="hidden text-[10px] uppercase font-bold tracking-widest text-slate-500 sm:block -mt-1">
+              Move Freight, Not Air
             </span>
           </div>
         </Link>

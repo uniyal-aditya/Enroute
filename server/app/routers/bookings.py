@@ -98,8 +98,8 @@ def my_bookings(
         out = BookingOut.model_validate(b)
         if out.route:
             out.route.contact_phone = None
-        # Driver's contact phone is only unlocked once the booking is CONFIRMED
-        out.contact_phone = b.route.contact_phone if b.status == BookingStatus.CONFIRMED else None
+        # Driver's contact phone is only unlocked once the booking is CONFIRMED or COMPLETED
+        out.contact_phone = b.route.contact_phone if b.status in (BookingStatus.CONFIRMED, BookingStatus.COMPLETED) else None
         results.append(out)
     return results
 

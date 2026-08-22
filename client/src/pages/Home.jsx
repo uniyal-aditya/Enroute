@@ -70,15 +70,15 @@ export default function Home() {
           <div className="lg:col-span-7 space-y-6 text-left">
             <div className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-3.5 py-1.5 text-xs font-bold text-blue-700 shadow-xs">
               <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-              Smart India Hackathon 2026 · Team AAPHAT
+              Smart India Hackathon 2026 · Move Freight, Not Air
             </div>
 
             <h1 className="text-3xl font-extrabold sm:text-4xl lg:text-5xl tracking-tight text-slate-900 leading-tight">
-              Turn Empty Truck Space Into <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 bg-clip-text text-transparent">Smart Deliveries.</span>
+              Move Freight, <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 bg-clip-text text-transparent">Not Air.</span>
             </h1>
 
             <p className="text-base sm:text-lg text-slate-600 max-w-xl leading-relaxed">
-              Enroute connects senders with trucks already heading their way — making deliveries 40–60% more affordable while helping drivers earn from unused cargo capacity.
+              Enroute connects senders with trucks already heading their way — making deliveries 40–60% more affordable while helping drivers turn unused cargo space into steady income.
             </p>
 
             {/* Quick Route Search Form */}

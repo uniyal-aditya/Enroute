@@ -14,7 +14,8 @@ import {
   Package, 
   Star, 
   AlertCircle, 
-  Info 
+  Info,
+  TrendingUp 
 } from 'lucide-react'
 import api, { getApiError } from '../api/client'
 import { useAuth } from '../context/AuthContext.jsx'
@@ -271,6 +272,38 @@ export default function ListingDetail() {
                   Available Space
                 </span>
                 <p className="mt-1 font-bold text-emerald-700">{listing.available_space}</p>
+              </div>
+            </div>
+
+            {/* Shared Freight vs Courier Savings Calculator */}
+            <div className="rounded-2xl border border-emerald-200 bg-gradient-to-r from-emerald-50/70 via-white to-blue-50/70 p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                  <TrendingUp className="h-4 w-4 text-emerald-600" />
+                  Estimated Cost Comparison (किराया बचत तुलना)
+                </span>
+                <span className="rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-black px-2.5 py-0.5">
+                  Save 40–60%
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                <div className="rounded-xl border border-emerald-200 bg-white p-3 space-y-0.5">
+                  <span className="text-[10px] uppercase font-bold text-emerald-700">Enroute Shared Backhaul</span>
+                  <div className="text-lg font-black text-slate-900 font-display">
+                    ₹{Math.round(listing.distance_km * listing.rate_per_km).toLocaleString()}
+                    <span className="text-[10px] text-slate-500 font-normal ml-1">approx shared trip</span>
+                  </div>
+                  <p className="text-[10px] text-emerald-600 font-medium">✓ Real-time space sharing · Direct driver contact</p>
+                </div>
+
+                <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 space-y-0.5 opacity-90">
+                  <span className="text-[10px] uppercase font-bold text-slate-500">Standalone Courier Cargo</span>
+                  <div className="text-lg font-bold text-slate-400 font-display line-through">
+                    ₹{Math.round(listing.distance_km * listing.rate_per_km * 2.3).toLocaleString()}
+                  </div>
+                  <p className="text-[10px] text-slate-500">Traditional dedicated truck hiring</p>
+                </div>
               </div>
             </div>
 
