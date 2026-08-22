@@ -39,12 +39,14 @@ export default function Navbar() {
         : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
     }`
 
+  const brandDestination = user ? (isDriver ? '/driver' : '/my-bookings') : '/'
+
   return (
     <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur-md shadow-xs">
       <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Brand Logo */}
         <Link 
-          to="/" 
+          to={brandDestination} 
           className="flex items-center gap-3 group"
           onClick={() => setMobileMenuOpen(false)}
         >
@@ -153,8 +155,8 @@ export default function Navbar() {
       {mobileMenuOpen && (
         <div className="border-b border-slate-200 bg-white px-4 py-4 md:hidden animate-fade-in space-y-3 shadow-lg">
           <nav className="space-y-1">
-            <NavLink to="/" end className={mobileLinkClass} onClick={() => setMobileMenuOpen(false)}>
-              Home
+            <NavLink to={brandDestination} end className={mobileLinkClass} onClick={() => setMobileMenuOpen(false)}>
+              {user ? 'My Dashboard' : 'Home'}
             </NavLink>
             <NavLink to="/routes" className={mobileLinkClass} onClick={() => setMobileMenuOpen(false)}>
               <MapPin className="h-4 w-4" />

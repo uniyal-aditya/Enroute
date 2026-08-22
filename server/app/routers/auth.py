@@ -13,7 +13,7 @@ router = APIRouter(prefix="/api/auth", tags=["Authentication"])
 @router.post("/register", response_model=Token, status_code=status.HTTP_201_CREATED)
 @router.post("/register/", response_model=Token, status_code=status.HTTP_201_CREATED, include_in_schema=False)
 def register(payload: UserRegister, db: Session = Depends(get_db)):
-    clean_email = payload.email.lower().strip()
+    clean_email = str(payload.email).strip().lower()
     existing = db.query(User).filter(User.email.ilike(clean_email)).first()
     if existing:
         raise HTTPException(
@@ -22,10 +22,10 @@ def register(payload: UserRegister, db: Session = Depends(get_db)):
         )
 
     user = User(
-        name=payload.name.strip(),
+        name=str(payload.name).strip(),
         email=clean_email,
-        password_hash=hash_password(payload.password),
-        phone=payload.phone.strip(),
+        password_hash=hash_password(str(payload.password)),
+        phone=str(payload.phone).strip(),
         role=payload.role,
         vehicle_number=payload.vehicle_number.strip() if payload.vehicle_number and payload.vehicle_number.strip() else None,
         truck_type=payload.truck_type.strip() if payload.truck_type and payload.truck_type.strip() else None,
@@ -77,10 +77,11 @@ async def login(
             detail="Email and password are required",
         )
 
-    clean_email = str(email).lower().strip()
+    clean_email = str(email).strip().lower()
+    clean_pwd = str(password)
     user = db.query(User).filter(User.email.ilike(clean_email)).first()
 
-    if not user or not verify_password(password, user.password_hash):
+    if not user or not verify_password(clean_pwd, user.password_hash):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect email or password",

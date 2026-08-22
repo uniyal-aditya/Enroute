@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { Truck, Package, User, Mail, Phone, Lock, Building, ArrowRight } from 'lucide-react'
@@ -21,9 +21,17 @@ const ROLES = [
 ]
 
 export default function Register() {
-  const { register } = useAuth()
+  const { user, register } = useAuth()
   const navigate = useNavigate()
   const [submitting, setSubmitting] = useState(false)
+
+  // When already logged in, redirect directly to dashboard
+  useEffect(() => {
+    if (user) {
+      const dest = user.role === 'DRIVER' ? '/driver' : '/my-bookings'
+      navigate(dest, { replace: true })
+    }
+  }, [user, navigate])
 
   const [form, setForm] = useState({
     name: '',
@@ -46,7 +54,7 @@ export default function Register() {
     try {
       const payload = {
         name: form.name.trim(),
-        email: form.email.trim(),
+        email: form.email.trim().toLowerCase(),
         password: form.password,
         phone: form.phone.trim(),
         role: form.role,
@@ -56,8 +64,8 @@ export default function Register() {
         truck_capacity: form.truck_capacity?.trim() || null,
         bio: form.bio?.trim() || null,
       }
-      const user = await register(payload)
-      navigate(user?.role === 'DRIVER' ? '/driver' : '/routes')
+      const newUser = await register(payload)
+      navigate(newUser?.role === 'DRIVER' ? '/driver' : '/my-bookings', { replace: true })
     } catch (err) {
       toast.error(getApiError(err, 'Registration failed'))
     } finally {

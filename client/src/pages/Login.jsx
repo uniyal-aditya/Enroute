@@ -1,43 +1,43 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { LogIn, ArrowRight, Lock, Mail } from 'lucide-react'
 import { useAuth } from '../context/AuthContext.jsx'
 import { getApiError } from '../api/client'
-import DemoLoginBanner from '../components/DemoLoginBanner.jsx'
 
 export default function Login() {
-  const { login } = useAuth()
+  const { user, login } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
   const [form, setForm] = useState({ email: '', password: '' })
   const [submitting, setSubmitting] = useState(false)
 
+  // When already logged in, redirect directly to dashboard
+  useEffect(() => {
+    if (user) {
+      const destination =
+        location.state?.from?.pathname || (user.role === 'DRIVER' ? '/driver' : '/my-bookings')
+      navigate(destination, { replace: true })
+    }
+  }, [user, navigate, location])
+
   const onSubmit = async (e) => {
     e.preventDefault()
     setSubmitting(true)
     try {
-      const user = await login(form.email.trim(), form.password)
+      const loggedUser = await login(form.email.trim(), form.password)
       const destination =
-        location.state?.from?.pathname || (user?.role === 'DRIVER' ? '/driver' : '/routes')
-      navigate(destination)
+        location.state?.from?.pathname || (loggedUser?.role === 'DRIVER' ? '/driver' : '/my-bookings')
+      navigate(destination, { replace: true })
     } catch (err) {
-      toast.error(getApiError(err, 'Login failed'))
+      toast.error(getApiError(err, 'Login failed. Please check your email and password.'))
     } finally {
       setSubmitting(false)
     }
   }
 
-  const handleDemoFill = (email, password) => {
-    setForm({ email, password })
-    toast('Demo credentials populated!', { icon: '🔑' })
-  }
-
   return (
     <div className="mx-auto mt-6 max-w-md py-6">
-      {/* Quick Demo Filler Banner for SIH 2026 Judges */}
-      <DemoLoginBanner onFill={handleDemoFill} />
-
       <div className="card p-6 sm:p-8 space-y-6">
         <div className="space-y-1">
           <h1 className="text-2xl font-extrabold text-slate-900">Welcome Back</h1>

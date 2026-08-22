@@ -15,13 +15,22 @@ import {
   Search 
 } from 'lucide-react'
 import api, { getApiError } from '../api/client'
+import { useAuth } from '../context/AuthContext.jsx'
 import ListingCard from '../components/ListingCard.jsx'
 
 export default function Home() {
+  const { user, isDriver } = useAuth()
   const navigate = useNavigate()
   const [featuredRoutes, setFeaturedRoutes] = useState([])
   const [loading, setLoading] = useState(true)
   const [quickSearch, setQuickSearch] = useState({ origin: '', destination: '' })
+
+  // When an authenticated user is on Home, automatically navigate to their respective dashboard
+  useEffect(() => {
+    if (user) {
+      navigate(isDriver ? '/driver' : '/my-bookings', { replace: true })
+    }
+  }, [user, isDriver, navigate])
 
   useEffect(() => {
     api
@@ -46,6 +55,7 @@ export default function Home() {
   }
 
   const routesList = Array.isArray(featuredRoutes) ? featuredRoutes : []
+  const dashboardPath = user ? (isDriver ? '/driver' : '/my-bookings') : '/routes'
 
   return (
     <div className="space-y-16 py-4 sm:space-y-24">
@@ -109,17 +119,19 @@ export default function Home() {
                 Find a Route
                 <ArrowRight className="h-4 w-4" />
               </Link>
-              <Link to="/register" className="btn-secondary !py-3 !px-6 text-sm">
+              <Link to={user ? dashboardPath : '/register'} className="btn-secondary !py-3 !px-6 text-sm">
                 <Truck className="h-4 w-4 text-blue-600" />
-                List Your Truck Space
+                {user ? 'Go to Dashboard' : 'List Your Truck Space'}
               </Link>
             </div>
           </div>
 
-          {/* Hero Right Image & Branding Graphic */}
           {/* Hero Right Image & Live Telemetry Card */}
           <div className="lg:col-span-5 flex flex-col items-center justify-center">
-            <div className="relative w-full max-w-md rounded-3xl border border-slate-200 bg-white p-6 shadow-xl space-y-4">
+            <Link
+              to={dashboardPath}
+              className="relative block w-full max-w-md rounded-3xl border border-slate-200 bg-white p-6 shadow-xl space-y-4 transition duration-300 hover:shadow-2xl hover:border-blue-300 group"
+            >
               {/* Telemetry Header */}
               <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                 <div className="flex items-center gap-2">
@@ -136,7 +148,7 @@ export default function Home() {
                 <img
                   src="/hero.png"
                   alt="Enroute Freight Fleet"
-                  className="h-48 w-auto max-w-full object-contain transition duration-500 hover:scale-105"
+                  className="h-48 w-auto max-w-full object-contain transition duration-500 group-hover:scale-105"
                 />
               </div>
 
@@ -171,7 +183,7 @@ export default function Home() {
                   <span>0 Empty Kilometers</span>
                 </div>
               </div>
-            </div>
+            </Link>
           </div>
         </div>
       </section>
@@ -367,8 +379,8 @@ export default function Home() {
           <p className="text-xs text-slate-600 leading-relaxed">
             Truck drivers and logistics owners can list their scheduled routes in under two minutes and monetize spare cargo volume.
           </p>
-          <Link to="/register" className="btn-primary !py-2.5 inline-flex text-xs font-bold">
-            List Your Truck Space
+          <Link to={user ? dashboardPath : '/register'} className="btn-primary !py-2.5 inline-flex text-xs font-bold">
+            {user ? 'Go to Driver Dashboard' : 'List Your Truck Space'}
             <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         </div>
