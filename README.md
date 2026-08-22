@@ -5,7 +5,7 @@
 > **Team:** AAPHAT  
 > **Repository:** [https://github.com/uniyal-aditya/Enroute](https://github.com/uniyal-aditya/Enroute)
 
-![Enroute Banner](/client/public/hero.png)
+![Enroute Banner](/client/public/hero2.png)
 
 ---
 
