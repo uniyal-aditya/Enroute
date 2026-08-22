@@ -851,39 +851,6 @@ export default function DriverDashboard() {
         </div>
       </div>
 
-      {/* Horn OK Please Highway Radio Driver Feature Banner */}
-      <div className="relative overflow-hidden rounded-3xl border border-orange-500/40 bg-gradient-to-r from-slate-900 via-slate-900 to-orange-950 p-5 text-white shadow-xl flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="flex items-center gap-4 z-10">
-          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-tr from-orange-500 to-amber-500 text-3xl shadow-lg shadow-orange-500/30">
-            🎺
-          </div>
-          <div className="space-y-0.5">
-            <div className="flex items-center gap-2">
-              <span className="text-base sm:text-lg font-black text-white tracking-tight font-display">
-                हॉर्न ओके प्लीज · Horn OK Please
-              </span>
-              <span className="rounded-full bg-orange-500/20 border border-orange-400/40 px-2.5 py-0.5 text-[10px] font-bold text-orange-300">
-                Highway Dhaba Radio
-              </span>
-            </div>
-            <p className="text-xs text-slate-300 max-w-xl leading-relaxed">
-              ट्रक ड्राइवर्स के लिए स्पेशल हाईवे म्यूज़िक, लाइव हॉर्न बीट्स, शायरी और नॉन-स्टॉप रोडट्रिप प्लेलिस्ट।
-            </p>
-          </div>
-        </div>
-
-        <Link
-          to="/horn-ok-please"
-          className="z-10 flex items-center gap-2 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-500 px-6 py-3 text-xs font-black text-black shadow-lg shadow-orange-500/30 transition hover:from-orange-400 hover:to-amber-400 active:scale-95 whitespace-nowrap self-start sm:self-auto"
-        >
-          <span>Open Radio (रेडियो शुरू करें)</span>
-          <ArrowRight className="h-4 w-4" />
-        </Link>
-
-        {/* Ambient subtle glow in background */}
-        <div className="pointer-events-none absolute -right-10 -bottom-10 h-36 w-36 rounded-full bg-orange-500/20 blur-2xl" />
-      </div>
-
       {/* Navigation Tabs */}
       <div className="flex border-b border-slate-200 gap-2 pb-px overflow-x-auto">
         {TABS.map((t) => {
