@@ -48,9 +48,11 @@ export default function Navbar() {
           className="flex items-center gap-3 group"
           onClick={() => setMobileMenuOpen(false)}
         >
-          <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 p-2 shadow-md shadow-blue-500/20 transition duration-200 group-hover:scale-105">
-            <img src="/favicon-32x32.png" alt="Enroute" className="h-6 w-6 object-contain brightness-0 invert" />
-          </div>
+          <img
+            src="/hero.png"
+            alt="Enroute Logo"
+            className="h-10 w-auto max-w-[50px] object-contain transition duration-200 group-hover:scale-105"
+          />
           <div>
             <div className="flex items-center gap-2">
               <span className="text-xl font-display font-black tracking-tight text-slate-900">

@@ -117,30 +117,59 @@ export default function Home() {
           </div>
 
           {/* Hero Right Image & Branding Graphic */}
+          {/* Hero Right Image & Live Telemetry Card */}
           <div className="lg:col-span-5 flex flex-col items-center justify-center">
-            <div className="relative w-full max-w-sm rounded-3xl border border-slate-200 bg-white p-5 shadow-lg">
-              <div className="overflow-hidden rounded-2xl bg-slate-50 p-4 ring-1 ring-slate-100">
+            <div className="relative w-full max-w-md rounded-3xl border border-slate-200 bg-white p-6 shadow-xl space-y-4">
+              {/* Telemetry Header */}
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                <div className="flex items-center gap-2">
+                  <span className="flex h-2.5 w-2.5 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="text-xs font-bold text-slate-900">Live Highway Corridor</span>
+                </div>
+                <span className="rounded-full bg-blue-50 border border-blue-200 px-2.5 py-0.5 text-[10px] font-bold text-blue-700">
+                  NH-58 Route
+                </span>
+              </div>
+
+              {/* Truck Illustration Banner */}
+              <div className="relative flex items-center justify-center rounded-2xl bg-gradient-to-b from-slate-50 to-blue-50/30 p-6">
                 <img
                   src="/hero.png"
-                  alt="Enroute Smart Logistics"
-                  className="mx-auto h-52 w-52 sm:h-64 sm:w-64 object-contain transition duration-500 hover:scale-105"
+                  alt="Enroute Freight Fleet"
+                  className="h-48 w-auto max-w-full object-contain transition duration-500 hover:scale-105"
                 />
               </div>
 
-              {/* Floating metrics pill */}
-              <div className="absolute -bottom-4 -left-4 rounded-xl border border-slate-200 bg-white px-4 py-2.5 shadow-lg flex items-center gap-3">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-100">
-                  <TrendingUp className="h-4 w-4" />
+              {/* Capacity Status & Corridor Progress */}
+              <div className="space-y-2 rounded-2xl bg-slate-50 border border-slate-200/80 p-3.5 text-xs">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-slate-800">Dehradun ➔ Delhi NCR</span>
+                  <span className="font-mono font-bold text-blue-600">245 km</span>
                 </div>
-                <div>
-                  <div className="text-xs font-bold text-slate-900">40–60% Savings</div>
-                  <div className="text-[10px] text-slate-500">On shared backhaul runs</div>
+
+                {/* Capacity Progress Bar */}
+                <div className="space-y-1">
+                  <div className="flex justify-between text-[11px] text-slate-500">
+                    <span>Spare Cargo Volume</span>
+                    <span className="font-bold text-emerald-700">70% Available (1.8T)</span>
+                  </div>
+                  <div className="h-2 w-full rounded-full bg-slate-200 overflow-hidden">
+                    <div className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-blue-600 w-[70%]" />
+                  </div>
                 </div>
               </div>
 
-              <div className="absolute -top-3 -right-3 rounded-xl border border-blue-600 bg-blue-600 px-3 py-1.5 shadow-md text-white text-[11px] font-bold flex items-center gap-1.5">
-                <Zap className="h-3.5 w-3.5" />
-                Zero Empty Kilometers
+              {/* Floating metrics pill */}
+              <div className="flex items-center justify-between pt-1">
+                <div className="flex items-center gap-2 rounded-xl bg-emerald-50 border border-emerald-200 px-3 py-1.5 text-emerald-800 text-[11px] font-bold">
+                  <TrendingUp className="h-3.5 w-3.5 text-emerald-600" />
+                  <span>40–60% Senders Savings</span>
+                </div>
+
+                <div className="flex items-center gap-1.5 rounded-xl bg-blue-50 border border-blue-200 px-3 py-1.5 text-blue-800 text-[11px] font-bold">
+                  <Zap className="h-3.5 w-3.5 text-blue-600" />
+                  <span>0 Empty Kilometers</span>
+                </div>
               </div>
             </div>
           </div>

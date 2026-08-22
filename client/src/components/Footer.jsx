@@ -9,9 +9,11 @@ export default function Footer() {
           {/* Col 1: Brand & SIH Info */}
           <div className="md:col-span-2 space-y-4">
             <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-600 p-2 shadow-md shadow-blue-500/20">
-                <img src="/favicon-32x32.png" alt="Enroute" className="h-5 w-5 object-contain brightness-0 invert" />
-              </div>
+              <img
+                src="/hero.png"
+                alt="Enroute Logo"
+                className="h-10 w-auto max-w-[50px] object-contain"
+              />
               <span className="text-xl font-display font-extrabold tracking-tight text-slate-900">
                 ENROUTE
               </span>
