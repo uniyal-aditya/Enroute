@@ -30,14 +30,23 @@ export default function Home() {
 
   return (
     <div>
-      <section className="rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 p-8 text-white">
-        <h1 className="text-2xl font-extrabold sm:text-3xl">
-          Trucks are already going your way.
-        </h1>
-        <p className="mt-2 max-w-xl text-sm text-blue-100 sm:text-base">
-          Enroute connects drivers with spare cargo capacity to people who need affordable
-          courier &amp; transport services. Search live routes below.
-        </p>
+      <section className="overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600">
+        <div className="grid grid-cols-1 items-center gap-6 p-8 sm:p-10 lg:grid-cols-[1fr_auto]">
+          <div className="text-white">
+            <h1 className="text-2xl font-extrabold sm:text-3xl">
+              Trucks are already going your way.
+            </h1>
+            <p className="mt-2 max-w-xl text-sm text-blue-100 sm:text-base">
+              Enroute connects drivers with spare cargo capacity to people who need affordable
+              courier &amp; transport services. Search live routes below.
+            </p>
+          </div>
+          <img
+            src="/hero.png"
+            alt="Enroute"
+            className="mx-auto h-36 w-36 rounded-2xl bg-white/10 object-contain p-2 ring-1 ring-white/20 sm:h-44 sm:w-44"
+          />
+        </div>
       </section>
 
       <section className="card mt-6 grid grid-cols-1 gap-3 p-4 sm:grid-cols-[1fr_1fr_1fr_auto]">

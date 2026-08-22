@@ -19,9 +19,7 @@ export default function Navbar() {
     <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/90 backdrop-blur">
       <div className="mx-auto flex h-14 w-full max-w-6xl items-center justify-between px-4">
         <Link to="/" className="flex items-center gap-2 text-lg font-extrabold tracking-tight">
-          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-600 text-sm text-white">
-            E
-          </span>
+          <img src="/favicon-32x32.png" alt="" className="h-7 w-7" />
           Enroute
         </Link>
 
