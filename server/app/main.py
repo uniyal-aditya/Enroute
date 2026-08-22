@@ -4,16 +4,17 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
 from app.database import Base, engine
 from app import models  # noqa: F401 - ensures models are registered on Base before create_all
-from app.routers import auth, listings, bookings
+from app.routers import auth, listings, bookings, seed
 
-# Creates tables if they don't exist yet. Fine for hackathon/dev speed;
-# swap to `alembic upgrade head` once you want real migrations tracked.
+# Creates tables if they don't exist yet
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
-    title="Enroute API",
-    description="Connects truck drivers with spare cargo capacity to people who need affordable courier/transport services.",
+    title="Enroute Logistics API",
+    description="Smart India Hackathon 2026 platform connecting truck drivers with spare cargo capacity to businesses and shippers.",
     version="1.0.0",
+    docs_url="/docs",
+    redoc_url="/redoc",
 )
 
 app.add_middleware(
@@ -27,8 +28,16 @@ app.add_middleware(
 app.include_router(auth.router)
 app.include_router(listings.router)
 app.include_router(bookings.router)
+app.include_router(seed.router)
 
 
 @app.get("/", tags=["Health"])
 def health_check():
-    return {"status": "ok", "service": "Enroute API"}
+    return {
+        "status": "ok",
+        "service": "Enroute Logistics API",
+        "version": "1.0.0",
+        "hackathon": "Smart India Hackathon 2026",
+        "theme": "Transportation & Logistics",
+        "team": "AAPHAT",
+    }

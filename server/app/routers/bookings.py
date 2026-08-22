@@ -23,7 +23,14 @@ def create_booking(
     if route.status != RouteStatus.ACTIVE:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="This route is no longer accepting bookings",
+            detail="This route is no longer accepting booking requests",
+        )
+
+    # Prevent customers from booking their own listing (if dual account logic ever occurred)
+    if route.driver_id == current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="You cannot book space on your own listed route",
         )
 
     existing = (
@@ -48,11 +55,27 @@ def create_booking(
         drop_location=payload.drop_location,
         goods_description=payload.goods_description,
         estimated_weight=payload.estimated_weight,
+        status=BookingStatus.PENDING,
     )
     db.add(booking)
     db.commit()
     db.refresh(booking)
-    return booking
+
+    # Reload with relationships
+    b = (
+        db.query(Booking)
+        .options(
+            joinedload(Booking.route).joinedload(RouteListing.driver),
+            joinedload(Booking.customer),
+        )
+        .filter(Booking.id == booking.id)
+        .first()
+    )
+    out = BookingOut.model_validate(b)
+    if out.route:
+        out.route.contact_phone = None
+    out.contact_phone = None
+    return out
 
 
 @router.get("/my-bookings", response_model=list[BookingOut])
@@ -62,7 +85,10 @@ def my_bookings(
 ):
     bookings = (
         db.query(Booking)
-        .options(joinedload(Booking.route).joinedload(RouteListing.driver))
+        .options(
+            joinedload(Booking.route).joinedload(RouteListing.driver),
+            joinedload(Booking.customer),
+        )
         .filter(Booking.customer_id == current_user.id)
         .order_by(Booking.created_at.desc())
         .all()
@@ -70,8 +96,9 @@ def my_bookings(
     results = []
     for b in bookings:
         out = BookingOut.model_validate(b)
-        out.route.contact_phone = None
-        # The driver's number travels with the booking only after approval
+        if out.route:
+            out.route.contact_phone = None
+        # Driver's contact phone is only unlocked once the booking is CONFIRMED
         out.contact_phone = b.route.contact_phone if b.status == BookingStatus.CONFIRMED else None
         results.append(out)
     return results
@@ -82,11 +109,14 @@ def driver_requests(
     db: Session = Depends(get_db),
     current_user: User = Depends(require_driver),
 ):
-    """All booking requests made against routes this driver posted."""
+    """All booking requests made against routes posted by this driver."""
     bookings = (
         db.query(Booking)
         .join(RouteListing, Booking.route_id == RouteListing.id)
-        .options(joinedload(Booking.route).joinedload(RouteListing.driver))
+        .options(
+            joinedload(Booking.route).joinedload(RouteListing.driver),
+            joinedload(Booking.customer),
+        )
         .filter(RouteListing.driver_id == current_user.id)
         .order_by(Booking.created_at.desc())
         .all()
@@ -94,8 +124,10 @@ def driver_requests(
     results = []
     for b in bookings:
         out = BookingOut.model_validate(b)
-        out.route.contact_phone = None
+        if out.route:
+            out.route.contact_phone = None
         out.contact_phone = b.route.contact_phone
+        out.customer_phone = b.customer.phone if b.customer else None
         results.append(out)
     return results
 
@@ -109,7 +141,10 @@ def update_booking_status(
 ):
     booking = (
         db.query(Booking)
-        .options(joinedload(Booking.route).joinedload(RouteListing.driver))
+        .options(
+            joinedload(Booking.route).joinedload(RouteListing.driver),
+            joinedload(Booking.customer),
+        )
         .filter(Booking.id == booking_id)
         .first()
     )
@@ -118,20 +153,21 @@ def update_booking_status(
     if booking.route.driver_id != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="You can only manage requests on your own routes",
+            detail="You can only manage booking requests on your own routes",
         )
-    if booking.status != BookingStatus.PENDING:
+    if booking.status not in (BookingStatus.PENDING, BookingStatus.CONFIRMED):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"This booking is already {booking.status.value}",
-        )
-    if payload.status not in (BookingStatus.CONFIRMED, BookingStatus.REJECTED):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Drivers can only CONFIRM or REJECT a pending request",
         )
 
     booking.status = payload.status
     db.commit()
     db.refresh(booking)
-    return booking
+
+    out = BookingOut.model_validate(booking)
+    if out.route:
+        out.route.contact_phone = None
+    out.contact_phone = booking.route.contact_phone
+    out.customer_phone = booking.customer.phone if booking.customer else None
+    return out

@@ -1,5 +1,4 @@
 from datetime import datetime
-
 from pydantic import BaseModel, Field, ConfigDict
 
 from app.models.route_listing import RouteStatus
@@ -25,8 +24,6 @@ class RouteListingCreate(BaseModel):
 
 
 class RouteListingUpdate(BaseModel):
-    """All fields optional - only the ones sent get updated (PUT semantics kept simple)."""
-
     origin: str | None = None
     destination: str | None = None
     origin_lat: float | None = None
@@ -60,13 +57,11 @@ class RouteListingOut(BaseModel):
     truck_capacity: str
     available_space: str
     rate_per_km: float
-    flat_rate: float | None
-    description: str | None
+    flat_rate: float | None = None
+    description: str | None = None
     status: RouteStatus
-    # Only populated for the route's owner; hidden from public browsing so the
-    # driver's number is revealed exclusively through a confirmed booking.
     contact_phone: str | None = None
     created_at: datetime
-    driver: UserOut
+    driver: UserOut | None = None
 
     model_config = ConfigDict(from_attributes=True)

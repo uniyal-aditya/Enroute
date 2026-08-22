@@ -8,11 +8,23 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
-    <meta name="theme-color" content="#2563eb" />
-    <title>Enroute — Spare truck capacity, on demand</title>
+    <meta name="theme-color" content="#1e40af" />
+    <meta name="description" content="Enroute — Smart two-sided logistics platform matching truck drivers with spare cargo capacity to senders for affordable, fast transport." />
+    <meta property="og:title" content="Enroute — Smart Logistics for Every Route | SIH 2026" />
+    <meta property="og:description" content="Turn empty truck cargo space into smart, affordable deliveries." />
+    <meta property="og:image" content="/hero.png" />
+    <title>Enroute — Smart Logistics for Every Route | SIH 2026</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
   </head>
-  <body class="bg-slate-50 text-slate-800 antialiased">
-    <div id="root"></div>
+  <body class="bg-slate-900 text-slate-100 antialiased selection:bg-blue-500 selection:text-white min-h-screen flex flex-col font-sans">
+    <div id="root" class="flex flex-col min-h-screen"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

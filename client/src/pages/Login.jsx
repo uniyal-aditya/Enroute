@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
+import { LogIn, ArrowRight, Lock, Mail } from 'lucide-react'
 import { useAuth } from '../context/AuthContext.jsx'
 import { getApiError } from '../api/client'
+import DemoLoginBanner from '../components/DemoLoginBanner.jsx'
 
 export default function Login() {
   const { login } = useAuth()
@@ -16,7 +18,9 @@ export default function Login() {
     setSubmitting(true)
     try {
       const user = await login(form.email, form.password)
-      navigate(location.state?.from?.pathname || (user.role === 'DRIVER' ? '/driver' : '/'))
+      const destination =
+        location.state?.from?.pathname || (user.role === 'DRIVER' ? '/driver' : '/routes')
+      navigate(destination)
     } catch (err) {
       toast.error(getApiError(err, 'Login failed'))
     } finally {
@@ -24,52 +28,81 @@ export default function Login() {
     }
   }
 
-  return (
-    <div className="mx-auto mt-10 max-w-sm">
-      <div className="card p-6">
-        <h1 className="text-xl font-bold">Welcome back</h1>
-        <p className="mt-1 text-sm text-slate-500">Log in to your Enroute account.</p>
+  const handleDemoFill = (email, password) => {
+    setForm({ email, password })
+    toast('Demo credentials populated!', { icon: '🔑' })
+  }
 
-        <form onSubmit={onSubmit} className="mt-5 space-y-4">
+  return (
+    <div className="mx-auto mt-6 max-w-md py-6">
+      {/* Quick Demo Filler Banner for SIH 2026 Judges */}
+      <DemoLoginBanner onFill={handleDemoFill} />
+
+      <div className="card p-6 sm:p-8 space-y-6">
+        <div className="space-y-1">
+          <h1 className="text-2xl font-extrabold text-white">Welcome Back</h1>
+          <p className="text-xs text-slate-400">
+            Sign in to access your Enroute shipments and route listings.
+          </p>
+        </div>
+
+        <form onSubmit={onSubmit} className="space-y-4">
           <div>
             <label className="label" htmlFor="email">
-              Email
+              Email Address
             </label>
-            <input
-              id="email"
-              type="email"
-              required
-              autoComplete="email"
-              className="input"
-              value={form.email}
-              onChange={(e) => setForm({ ...form, email: e.target.value })}
-            />
+            <div className="relative">
+              <Mail className="pointer-events-none absolute left-3.5 top-3 h-4 w-4 text-slate-500" />
+              <input
+                id="email"
+                type="email"
+                required
+                autoComplete="email"
+                placeholder="you@example.com"
+                className="input !pl-10"
+                value={form.email}
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
+              />
+            </div>
           </div>
+
           <div>
-            <label className="label" htmlFor="password">
-              Password
-            </label>
-            <input
-              id="password"
-              type="password"
-              required
-              autoComplete="current-password"
-              className="input"
-              value={form.password}
-              onChange={(e) => setForm({ ...form, password: e.target.value })}
-            />
+            <div className="flex items-center justify-between">
+              <label className="label" htmlFor="password">
+                Password
+              </label>
+            </div>
+            <div className="relative">
+              <Lock className="pointer-events-none absolute left-3.5 top-3 h-4 w-4 text-slate-500" />
+              <input
+                id="password"
+                type="password"
+                required
+                autoComplete="current-password"
+                placeholder="••••••••"
+                className="input !pl-10"
+                value={form.password}
+                onChange={(e) => setForm({ ...form, password: e.target.value })}
+              />
+            </div>
           </div>
-          <button type="submit" disabled={submitting} className="btn-primary w-full">
-            {submitting ? 'Logging in…' : 'Log In'}
+
+          <button
+            type="submit"
+            disabled={submitting}
+            className="btn-primary w-full !py-3 text-xs font-bold"
+          >
+            <LogIn className="h-4 w-4" />
+            {submitting ? 'Authenticating…' : 'Sign In'}
           </button>
         </form>
 
-        <p className="mt-4 text-center text-sm text-slate-500">
-          No account?{' '}
-          <Link to="/register" className="font-semibold text-blue-600 hover:underline">
-            Sign up
+        <div className="border-t border-slate-800 pt-4 text-center text-xs text-slate-400">
+          Don't have an account yet?{' '}
+          <Link to="/register" className="font-bold text-blue-400 hover:text-blue-300 transition">
+            Create Account
           </Link>
-        </p>
+        </div>
       </div>
     </div>
   )
