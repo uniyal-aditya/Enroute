@@ -21,7 +21,7 @@ const ROLES = [
 ]
 
 export default function Register() {
-  const { register, login } = useAuth()
+  const { register } = useAuth()
   const navigate = useNavigate()
   const [submitting, setSubmitting] = useState(false)
 
@@ -44,9 +44,20 @@ export default function Register() {
     e.preventDefault()
     setSubmitting(true)
     try {
-      await register(form)
-      await login(form.email, form.password)
-      navigate(form.role === 'DRIVER' ? '/driver' : '/routes')
+      const payload = {
+        name: form.name.trim(),
+        email: form.email.trim(),
+        password: form.password,
+        phone: form.phone.trim(),
+        role: form.role,
+        company_name: form.company_name?.trim() || null,
+        vehicle_number: form.vehicle_number?.trim() || null,
+        truck_type: form.truck_type?.trim() || null,
+        truck_capacity: form.truck_capacity?.trim() || null,
+        bio: form.bio?.trim() || null,
+      }
+      const user = await register(payload)
+      navigate(user?.role === 'DRIVER' ? '/driver' : '/routes')
     } catch (err) {
       toast.error(getApiError(err, 'Registration failed'))
     } finally {

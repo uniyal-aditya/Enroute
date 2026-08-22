@@ -1,5 +1,4 @@
 from fastapi import APIRouter, Depends, HTTPException, Request, status
-from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
 from app.dependencies.database import get_db
@@ -12,8 +11,10 @@ router = APIRouter(prefix="/api/auth", tags=["Authentication"])
 
 
 @router.post("/register", response_model=Token, status_code=status.HTTP_201_CREATED)
+@router.post("/register/", response_model=Token, status_code=status.HTTP_201_CREATED, include_in_schema=False)
 def register(payload: UserRegister, db: Session = Depends(get_db)):
-    existing = db.query(User).filter(User.email == payload.email).first()
+    clean_email = payload.email.lower().strip()
+    existing = db.query(User).filter(User.email.ilike(clean_email)).first()
     if existing:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -21,16 +22,16 @@ def register(payload: UserRegister, db: Session = Depends(get_db)):
         )
 
     user = User(
-        name=payload.name,
-        email=payload.email,
+        name=payload.name.strip(),
+        email=clean_email,
         password_hash=hash_password(payload.password),
-        phone=payload.phone,
+        phone=payload.phone.strip(),
         role=payload.role,
-        vehicle_number=payload.vehicle_number,
-        truck_type=payload.truck_type,
-        truck_capacity=payload.truck_capacity,
-        company_name=payload.company_name,
-        bio=payload.bio,
+        vehicle_number=payload.vehicle_number.strip() if payload.vehicle_number and payload.vehicle_number.strip() else None,
+        truck_type=payload.truck_type.strip() if payload.truck_type and payload.truck_type.strip() else None,
+        truck_capacity=payload.truck_capacity.strip() if payload.truck_capacity and payload.truck_capacity.strip() else None,
+        company_name=payload.company_name.strip() if payload.company_name and payload.company_name.strip() else None,
+        bio=payload.bio.strip() if payload.bio and payload.bio.strip() else None,
     )
     db.add(user)
     db.commit()
@@ -45,6 +46,7 @@ def register(payload: UserRegister, db: Session = Depends(get_db)):
 
 
 @router.post("/login", response_model=Token)
+@router.post("/login/", response_model=Token, include_in_schema=False)
 async def login(
     request: Request,
     db: Session = Depends(get_db),
@@ -52,16 +54,22 @@ async def login(
     email = None
     password = None
 
-    # Handle both JSON body and application/x-www-form-urlencoded (OAuth2 Form)
+    # Handle both JSON body and form-urlencoded
     content_type = request.headers.get("content-type", "")
     if "application/json" in content_type:
-        body = await request.json()
-        email = body.get("email") or body.get("username")
-        password = body.get("password")
+        try:
+            body = await request.json()
+            email = body.get("email") or body.get("username")
+            password = body.get("password")
+        except Exception:
+            pass
     else:
-        form = await request.form()
-        email = form.get("username") or form.get("email")
-        password = form.get("password")
+        try:
+            form = await request.form()
+            email = form.get("username") or form.get("email")
+            password = form.get("password")
+        except Exception:
+            pass
 
     if not email or not password:
         raise HTTPException(
@@ -69,7 +77,8 @@ async def login(
             detail="Email and password are required",
         )
 
-    user = db.query(User).filter(User.email == email).first()
+    clean_email = str(email).lower().strip()
+    user = db.query(User).filter(User.email.ilike(clean_email)).first()
 
     if not user or not verify_password(password, user.password_hash):
         raise HTTPException(
@@ -87,11 +96,13 @@ async def login(
 
 
 @router.get("/me", response_model=UserOut)
+@router.get("/me/", response_model=UserOut, include_in_schema=False)
 def read_current_user(current_user: User = Depends(get_current_user)):
     return current_user
 
 
 @router.put("/profile", response_model=UserOut)
+@router.put("/profile/", response_model=UserOut, include_in_schema=False)
 def update_profile(
     payload: UserProfileUpdate,
     db: Session = Depends(get_db),
@@ -99,7 +110,10 @@ def update_profile(
 ):
     for field, value in payload.model_dump(exclude_unset=True).items():
         if value is not None:
-            setattr(current_user, field, value)
+            if isinstance(value, str):
+                setattr(current_user, field, value.strip() or None)
+            else:
+                setattr(current_user, field, value)
 
     db.commit()
     db.refresh(current_user)

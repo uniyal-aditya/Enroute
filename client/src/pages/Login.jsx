@@ -17,9 +17,9 @@ export default function Login() {
     e.preventDefault()
     setSubmitting(true)
     try {
-      const user = await login(form.email, form.password)
+      const user = await login(form.email.trim(), form.password)
       const destination =
-        location.state?.from?.pathname || (user.role === 'DRIVER' ? '/driver' : '/routes')
+        location.state?.from?.pathname || (user?.role === 'DRIVER' ? '/driver' : '/routes')
       navigate(destination)
     } catch (err) {
       toast.error(getApiError(err, 'Login failed'))
