@@ -16,7 +16,7 @@ import {
   AlertCircle,
 } from 'lucide-react'
 import api, { getApiError } from '../api/client'
-import { useAuth } from '../context/AuthContext.jsx'
+import { useGuest } from '../context/GuestContext.jsx'
 import RouteMap from '../components/RouteMap.jsx'
 import StatusTimeline from '../components/StatusTimeline.jsx'
 import {
@@ -120,7 +120,7 @@ function BookingRequestForm({ listing, onBooked }) {
 
 export default function ListingDetail() {
   const { id } = useParams()
-  const { user, isDriver } = useAuth()
+  const { hasProfile, isDriver, isCustomer } = useGuest()
   const [listing, setListing] = useState(null)
   const [loading, setLoading] = useState(true)
   const [myBooking, setMyBooking] = useState(null)
@@ -133,7 +133,7 @@ export default function ListingDetail() {
       .catch((err) => toast.error(getApiError(err, 'Could not load route details')))
       .finally(() => setLoading(false))
 
-    if (user && user.role === 'CUSTOMER') {
+    if (isCustomer) {
       api
         .get('/bookings/my-bookings')
         .then((res) => {
@@ -148,7 +148,7 @@ export default function ListingDetail() {
 
   useEffect(() => {
     loadData()
-  }, [id, user])
+  }, [id, hasProfile, isCustomer])
 
   if (loading) {
     return (
@@ -173,7 +173,7 @@ export default function ListingDetail() {
     )
   }
 
-  const isMyListing = user && user.id === listing.driver_id
+  const isMyListing = isDriver
 
   return (
     <div className="space-y-6 py-2">
@@ -371,16 +371,16 @@ export default function ListingDetail() {
                   </div>
                 )}
               </div>
-            ) : user && user.role === 'CUSTOMER' ? (
+            ) : isCustomer ? (
               <div className="space-y-3">
                 <h3 className="text-sm font-bold text-slate-900">Request Cargo Space</h3>
                 <BookingRequestForm listing={listing} onBooked={loadData} />
               </div>
-            ) : user && isDriver ? (
+            ) : isDriver ? (
               <div className="text-center space-y-3 py-2 text-xs text-slate-600">
-                <p>You are currently logged in as a <strong>Fleet Driver</strong>. Booking requests are placed by Shippers.</p>
-                <Link to="/driver" className="btn-secondary text-xs w-full">
-                  Go to Driver Terminal
+                <p>You are viewing as a <strong>Driver</strong>. Switch to Parcel Mode to place a booking request.</p>
+                <Link to="/dashboard" className="btn-secondary text-xs w-full">
+                  Go to Dashboard
                 </Link>
               </div>
             ) : (
@@ -388,16 +388,11 @@ export default function ListingDetail() {
                 <Package className="mx-auto h-8 w-8 text-blue-600" />
                 <h3 className="font-bold text-slate-900 text-sm">Want to Book Spare Space?</h3>
                 <p className="text-xs text-slate-500">
-                  Sign in or create a free Shipper account to place a cargo consignment request on this run.
+                  Get started to place a cargo consignment request on this run.
                 </p>
-                <div className="grid grid-cols-2 gap-2 pt-1">
-                  <Link to="/login" className="btn-secondary text-xs">
-                    Sign In
-                  </Link>
-                  <Link to="/register" className="btn-primary text-xs">
-                    Get Started
-                  </Link>
-                </div>
+                <Link to="/onboarding" className="btn-primary text-xs w-full">
+                  Get Started — It's Free
+                </Link>
               </div>
             )}
           </div>

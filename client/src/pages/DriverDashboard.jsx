@@ -20,7 +20,7 @@ import {
   AlertCircle,
 } from 'lucide-react'
 import api, { getApiError } from '../api/client'
-import { useAuth } from '../context/AuthContext.jsx'
+import { useGuest } from '../context/GuestContext.jsx'
 import LocationPicker from '../components/LocationPicker.jsx'
 import {
   formatDateTime,
@@ -84,7 +84,7 @@ const ROUTE_PRESETS = [
 ]
 
 function CreateListingForm({ onCreated }) {
-  const { user } = useAuth()
+  const { profile } = useGuest()
   const [originPoint, setOriginPoint] = useState(null)
   const [destPoint, setDestPoint] = useState(null)
   const [submitting, setSubmitting] = useState(false)
@@ -93,13 +93,13 @@ function CreateListingForm({ onCreated }) {
     destination: '',
     departure_date: '',
     distance_km: '',
-    truck_type: user?.truck_type || 'Tata 407 (Medium Freight)',
-    truck_capacity: user?.truck_capacity || '2.5 Tons',
+    truck_type: profile?.truckType || 'Tata 407 (Medium Freight)',
+    truck_capacity: profile?.truckCapacity || '2.5 Tons',
     available_space: '',
     rate_per_km: '18.5',
     flat_rate: '',
     description: '',
-    contact_phone: user?.phone || '',
+    contact_phone: profile?.phone || '',
   })
 
   const set = (k) => (e) => setForm({ ...form, [k]: e.target.value })
@@ -364,7 +364,7 @@ function CreateListingForm({ onCreated }) {
 }
 
 export default function DriverDashboard() {
-  const { user } = useAuth()
+  const { name } = useGuest()
   const [myListings, setMyListings] = useState([])
   const [driverBookings, setDriverBookings] = useState([])
   const [loading, setLoading] = useState(true)

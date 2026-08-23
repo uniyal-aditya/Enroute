@@ -21,6 +21,19 @@ class Settings:
     ALGORITHM: str = os.getenv("ALGORITHM", "HS256")
     ACCESS_TOKEN_EXPIRE_MINUTES: int = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "1440"))
 
+    # --------------------------------------------------------------------------
+    # DEMO_MODE — when True the API accepts unauthenticated requests and maps
+    # them to the pre-seeded demo accounts based on the X-Demo-Role header.
+    #
+    # DEMO_MODE=true  → hackathon showcase (no JWT required)
+    # DEMO_MODE=false → normal JWT auth (production mode)
+    # --------------------------------------------------------------------------
+    DEMO_MODE: bool = os.getenv("DEMO_MODE", "true").lower() in ("1", "true", "yes")
+
+    # Demo user emails — must match the accounts seeded in routers/seed.py
+    DEMO_DRIVER_EMAIL: str = os.getenv("DEMO_DRIVER_EMAIL", "driver@enroute.com")
+    DEMO_CUSTOMER_EMAIL: str = os.getenv("DEMO_CUSTOMER_EMAIL", "customer@enroute.com")
+
     # CORS origins read from the Railway env var (comma-separated).
     CORS_ORIGINS: str = os.getenv("CORS_ORIGINS", "")
 
