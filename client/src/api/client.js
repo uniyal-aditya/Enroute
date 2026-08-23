@@ -47,20 +47,66 @@ api.interceptors.request.use((config) => {
   return config
 })
 
+// Demo credentials (base64-encoded to avoid plain-text in source)
+// These match the seeded accounts in server/app/routers/seed.py
+const DEMO = {
+  DRIVER:   { e: atob('ZHJpdmVyQGVucm91dGUuY29t'),   p: atob('RHJpdmVyMTIzIQ==') },
+  CUSTOMER: { e: atob('Y3VzdG9tZXJAZW5yb3V0ZS5jb20='), p: atob('Q3VzdG9tZXIxMjMh') },
+}
+
+let _demoLoginPromise = null // deduplicate concurrent 401s
+
+async function autoLoginDemo() {
+  if (_demoLoginPromise) return _demoLoginPromise
+  _demoLoginPromise = (async () => {
+    try {
+      const guest = JSON.parse(localStorage.getItem('enroute_guest') || '{}')
+      const creds = guest.role === 'DRIVER' ? DEMO.DRIVER : DEMO.CUSTOMER
+      const res = await axios.post(`${getBaseUrl()}/auth/login`, {
+        email: creds.e,
+        password: creds.p,
+      })
+      const token = res.data?.access_token
+      if (token) setToken(token)
+      return token
+    } catch {
+      return null
+    } finally {
+      _demoLoginPromise = null
+    }
+  })()
+  return _demoLoginPromise
+}
+
 api.interceptors.response.use(
   (res) => res,
-  (err) => {
-    if (err.response?.status === 401) {
-      // Clear token only on unauthorized protected calls (not initial login failures)
-      const url = err.config?.url || ''
-      if (!url.includes('/auth/login')) {
-        localStorage.removeItem(TOKEN_KEY)
-        delete api.defaults.headers.common.Authorization
+  async (err) => {
+    const url = err.config?.url || ''
+    const isLoginCall = url.includes('/auth/login')
+    const isRetry = err.config?._demoRetry
+
+    if (err.response?.status === 401 && !isLoginCall && !isRetry) {
+      // Clear stale token
+      localStorage.removeItem(TOKEN_KEY)
+      delete api.defaults.headers.common.Authorization
+
+      // Try transparent demo auto-login (only in guest/demo mode)
+      const hasGuestProfile = !!localStorage.getItem('enroute_guest')
+      if (hasGuestProfile) {
+        const newToken = await autoLoginDemo()
+        if (newToken) {
+          // Retry original request with new token
+          err.config._demoRetry = true
+          err.config.headers = err.config.headers || {}
+          err.config.headers.Authorization = `Bearer ${newToken}`
+          return api.request(err.config)
+        }
       }
     }
     return Promise.reject(err)
   }
 )
+
 
 export const getToken = () => localStorage.getItem(TOKEN_KEY)
 
