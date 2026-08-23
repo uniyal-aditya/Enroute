@@ -21,8 +21,16 @@ class Settings:
     ALGORITHM: str = os.getenv("ALGORITHM", "HS256")
     ACCESS_TOKEN_EXPIRE_MINUTES: int = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "1440"))
 
-    # CORS - comma separated origins in .env, split into a list below
-    CORS_ORIGINS: str = os.getenv("CORS_ORIGINS", "http://localhost:5173")
+    # CORS - comma separated origins, overridable via CORS_ORIGINS env var.
+    # The default already includes all known production and local-dev origins so
+    # the app works even if the Railway env var is missing or misconfigured.
+    CORS_ORIGINS: str = os.getenv(
+        "CORS_ORIGINS",
+        "http://localhost:5173,"
+        "http://localhost:4173,"
+        "https://enroute-logistics.vercel.app,"
+        "https://enroute-logistics.vercel.app/",
+    )
 
     @property
     def cors_origins_list(self) -> list[str]:
