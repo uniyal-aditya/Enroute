@@ -26,7 +26,13 @@ class Settings:
 
     @property
     def cors_origins_list(self) -> list[str]:
-        return [origin.strip() for origin in self.CORS_ORIGINS.split(",") if origin.strip()]
+        # Strip surrounding whitespace and trailing slashes so operators can safely
+        # copy-paste URLs from browsers (which often include trailing slashes).
+        return [
+            origin.strip().rstrip("/")
+            for origin in self.CORS_ORIGINS.split(",")
+            if origin.strip()
+        ]
 
 
 # Single shared instance - import this everywhere else
