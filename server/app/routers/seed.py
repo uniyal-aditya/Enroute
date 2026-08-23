@@ -29,11 +29,6 @@ def seed_database(db: Session):
             password_hash=hash_password("Driver123!"),
             phone="9876543210",
             role=UserRole.DRIVER,
-            vehicle_number="UK-07-TA-4521",
-            truck_type="Tata 407 (Medium Freight)",
-            truck_capacity="2.5 Tons",
-            company_name="Garhwal Freight Logistics",
-            bio="Over 8 years of trusted regional trucking across Uttarakhand, Delhi NCR, and UP highways. Always running on-time with safe handling.",
         )
         db.add(driver)
         db.flush()
@@ -47,11 +42,6 @@ def seed_database(db: Session):
             password_hash=hash_password("Driver123!"),
             phone="9811223344",
             role=UserRole.DRIVER,
-            vehicle_number="DL-1L-AA-9988",
-            truck_type="Eicher Pro 2049 (Closed Container)",
-            truck_capacity="3.0 Tons",
-            company_name="Jaipur-Delhi Express Cargo",
-            bio="Regular scheduled runs between Delhi, Jaipur, and Chandigarh with weatherproof container space.",
         )
         db.add(driver2)
         db.flush()
@@ -65,8 +55,6 @@ def seed_database(db: Session):
             password_hash=hash_password("Customer123!"),
             phone="9898765432",
             role=UserRole.CUSTOMER,
-            company_name="Verma Handicrafts & Textiles",
-            bio="Small business owner shipping artisanal textiles and home decor across North India.",
         )
         db.add(customer)
         db.flush()
@@ -80,11 +68,10 @@ def seed_database(db: Session):
             password_hash=hash_password("Customer123!"),
             phone="9871122334",
             role=UserRole.CUSTOMER,
-            company_name="Himalayan Organic Spices",
-            bio="Regular sender of agricultural products and packaged organic goods.",
         )
         db.add(customer2)
         db.flush()
+
 
     now = datetime.utcnow()
 
