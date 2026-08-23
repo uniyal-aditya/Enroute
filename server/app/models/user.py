@@ -1,7 +1,7 @@
 import enum
 from datetime import datetime
 
-from sqlalchemy import Column, Integer, String, DateTime, Enum, Text
+from sqlalchemy import Column, Integer, String, DateTime, Enum
 from sqlalchemy.orm import relationship
 
 from app.database import Base
@@ -23,12 +23,11 @@ class User(Base):
     role = Column(Enum(UserRole), nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
 
-    # Extended driver & business profile fields
-    vehicle_number = Column(String(30), nullable=True)
-    truck_type = Column(String(50), nullable=True)
-    truck_capacity = Column(String(50), nullable=True)
-    company_name = Column(String(100), nullable=True)
-    bio = Column(Text, nullable=True)
+    # NOTE: Extended profile fields (vehicle_number, truck_type, truck_capacity,
+    # company_name, bio) are intentionally NOT in this model because they do not
+    # exist in the live Supabase PostgreSQL schema.
+    # In demo/hackathon mode these details are stored in localStorage on the
+    # frontend. Add a proper DB migration before re-enabling them in production.
 
     # A driver can post many route listings; a customer can make many bookings
     route_listings = relationship(
