@@ -1,12 +1,15 @@
-import { Routes, Route, Link } from 'react-router-dom'
+import { Routes, Route, Navigate, Link } from 'react-router-dom'
 import Navbar from './components/Navbar.jsx'
 import Footer from './components/Footer.jsx'
-import ProtectedRoute from './components/ProtectedRoute.jsx'
+import GuestRoute from './components/GuestRoute.jsx'
+import ProtectedRoute from './components/ProtectedRoute.jsx' // kept — restore auth later
 import Home from './pages/Home.jsx'
+import Onboarding from './pages/Onboarding.jsx'
+import Dashboard from './pages/Dashboard.jsx'
 import BrowseRoutes from './pages/BrowseRoutes.jsx'
 import ListingDetail from './pages/ListingDetail.jsx'
-import Login from './pages/Login.jsx'
-import Register from './pages/Register.jsx'
+import Login from './pages/Login.jsx'     // kept at /login — not linked from nav
+import Register from './pages/Register.jsx' // kept at /register — not linked from nav
 import DriverDashboard from './pages/DriverDashboard.jsx'
 import MyBookings from './pages/MyBookings.jsx'
 import Profile from './pages/Profile.jsx'
@@ -35,45 +38,61 @@ function NotFound() {
 export default function App() {
   return (
     <div className="relative flex min-h-screen flex-col bg-slate-50 text-slate-900 antialiased selection:bg-blue-100 selection:text-blue-900">
-      {/* Subtle modern background decorative gradients */}
+      {/* Subtle background gradients */}
       <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
         <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-gradient-to-br from-blue-100/50 via-indigo-50/40 to-transparent blur-3xl opacity-80" />
         <div className="absolute top-[600px] -right-40 w-[600px] h-[600px] bg-gradient-to-tl from-emerald-50/40 via-blue-50/30 to-transparent blur-3xl opacity-70" />
       </div>
 
-      <Navbar />
-      <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-6 sm:px-6 lg:px-8">
-        <Routes>
-          {/* Public Routes */}
-          <Route path="/" element={<Home />} />
-          <Route path="/routes" element={<BrowseRoutes />} />
-          <Route path="/routes/:id" element={<ListingDetail />} />
-          <Route path="/listings/:id" element={<ListingDetail />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+      {/* Onboarding has its own full-screen layout, skip Navbar/Footer */}
+      <Routes>
+        <Route path="/onboarding" element={<Onboarding />} />
 
-          {/* Customer Protected Routes */}
-          <Route element={<ProtectedRoute role="CUSTOMER" />}>
-            <Route path="/my-bookings" element={<MyBookings />} />
-            <Route path="/bookings" element={<MyBookings />} />
-          </Route>
+        {/* All other routes share the Navbar + Footer shell */}
+        <Route
+          path="*"
+          element={
+            <>
+              <Navbar />
+              <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-6 sm:px-6 lg:px-8">
+                <Routes>
+                  {/* Public */}
+                  <Route path="/" element={<Home />} />
+                  <Route path="/routes" element={<BrowseRoutes />} />
+                  <Route path="/routes/:id" element={<ListingDetail />} />
+                  <Route path="/listings/:id" element={<ListingDetail />} />
 
-          {/* Driver Protected Routes */}
-          <Route element={<ProtectedRoute role="DRIVER" />}>
-            <Route path="/driver" element={<DriverDashboard />} />
-            <Route path="/driver/*" element={<DriverDashboard />} />
-          </Route>
+                  {/* Auth pages kept but not linked from nav */}
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/register" element={<Register />} />
 
-          {/* Common Protected Profile Route */}
-          <Route element={<ProtectedRoute />}>
-            <Route path="/profile" element={<Profile />} />
-          </Route>
+                  {/* Guest-guarded routes (redirect to /onboarding if no profile) */}
+                  <Route element={<GuestRoute />}>
+                    <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/profile" element={<Profile />} />
+                  </Route>
 
-          {/* 404 Fallback */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </main>
-      <Footer />
+                  {/* Driver Terminal — guest guarded, then shows DriverDashboard */}
+                  <Route element={<GuestRoute />}>
+                    <Route path="/driver" element={<DriverDashboard />} />
+                    <Route path="/driver/*" element={<DriverDashboard />} />
+                  </Route>
+
+                  {/* My Bookings — guest guarded */}
+                  <Route element={<GuestRoute />}>
+                    <Route path="/my-bookings" element={<MyBookings />} />
+                    <Route path="/bookings" element={<MyBookings />} />
+                  </Route>
+
+                  {/* 404 */}
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </main>
+              <Footer />
+            </>
+          }
+        />
+      </Routes>
     </div>
   )
 }

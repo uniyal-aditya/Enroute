@@ -16,24 +16,17 @@ import {
   CheckCircle2,
 } from 'lucide-react'
 import api from '../api/client'
-import { useAuth } from '../context/AuthContext.jsx'
+import { useGuest } from '../context/GuestContext.jsx'
 import { useTranslation } from '../context/LanguageContext.jsx'
 import ListingCard from '../components/ListingCard.jsx'
 
 export default function Home() {
-  const { user, isDriver } = useAuth()
+  const { hasProfile } = useGuest()
   const { t } = useTranslation()
   const navigate = useNavigate()
   const [featuredRoutes, setFeaturedRoutes] = useState([])
   const [loading, setLoading] = useState(true)
   const [quickSearch, setQuickSearch] = useState({ origin: '', destination: '', truck_type: '' })
-
-  // Auto-navigate authenticated users to their corresponding dashboard
-  useEffect(() => {
-    if (user) {
-      navigate(isDriver ? '/driver' : '/my-bookings', { replace: true })
-    }
-  }, [user, isDriver, navigate])
 
   useEffect(() => {
     api
@@ -95,11 +88,11 @@ export default function Home() {
                 {t('hero_cta_browse', 'Explore Live Routes')}
               </Link>
               <Link
-                to="/register"
+                to="/onboarding"
                 className="inline-flex items-center gap-2 rounded-xl border border-white/30 bg-white/10 px-5 py-3 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/20 active:scale-[0.98]"
               >
                 <Truck className="h-4 w-4 text-blue-200" />
-                {t('hero_cta_driver', 'List Your Truck Capacity')}
+                {hasProfile ? t('hero_cta_dashboard', 'Go to Dashboard') : t('hero_cta_driver', 'Get Started Free')}
               </Link>
             </div>
           </div>
