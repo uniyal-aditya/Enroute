@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useState, useCallback } from 'react'
 import toast from 'react-hot-toast'
 import api, { getApiError, setToken, clearToken, getToken } from '../api/client'
 
@@ -8,17 +8,17 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
 
-  const refreshUser = async () => {
+  const refreshUser = useCallback(async () => {
     try {
       const res = await api.get('/auth/me')
       setUser(res.data)
       return res.data
-    } catch {
+    } catch (err) {
       clearToken()
       setUser(null)
       return null
     }
-  }
+  }, [])
 
   useEffect(() => {
     const token = getToken()
@@ -27,14 +27,17 @@ export function AuthProvider({ children }) {
       return
     }
     refreshUser().finally(() => setLoading(false))
-  }, [])
+  }, [refreshUser])
 
   const login = async (email, password) => {
-    const res = await api.post('/auth/login', { email, password })
-    setToken(res.data.access_token)
+    const cleanEmail = email.trim().toLowerCase()
+    const res = await api.post('/auth/login', { email: cleanEmail, password })
+    if (res.data.access_token) {
+      setToken(res.data.access_token)
+    }
     const currentUser = res.data.user || (await refreshUser())
     setUser(currentUser)
-    toast.success(`Welcome back, ${currentUser.name}!`)
+    toast.success(`Welcome back, ${currentUser?.name || 'User'}!`)
     return currentUser
   }
 
@@ -51,7 +54,7 @@ export function AuthProvider({ children }) {
   const updateProfile = async (payload) => {
     const res = await api.put('/auth/profile', payload)
     setUser(res.data)
-    toast.success('Profile updated!')
+    toast.success('Profile updated successfully!')
     return res.data
   }
 

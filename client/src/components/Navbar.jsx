@@ -1,220 +1,398 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext.jsx'
-import { 
-  Truck, 
-  MapPin, 
-  Package, 
-  User as UserIcon, 
-  LogOut, 
-  LogIn, 
-  Menu, 
-  X, 
-  PlusCircle, 
-  ShieldCheck 
+import { useTranslation } from '../context/LanguageContext.jsx'
+import LanguageSelector from './LanguageSelector.jsx'
+import {
+  Truck,
+  Package,
+  User as UserIcon,
+  LogOut,
+  LogIn,
+  Menu,
+  X,
+  Zap,
+  ChevronDown,
+  Sparkles,
+  ShieldCheck,
+  Compass,
 } from 'lucide-react'
 
 export default function Navbar() {
-  const { user, logout, isDriver, isCustomer } = useAuth()
+  const { user, login, logout, isDriver, isCustomer } = useAuth()
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [userDropdownOpen, setUserDropdownOpen] = useState(false)
+  const [demoDropdownOpen, setDemoDropdownOpen] = useState(false)
+  const userMenuRef = useRef(null)
+  const demoMenuRef = useRef(null)
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target)) {
+        setUserDropdownOpen(false)
+      }
+      if (demoMenuRef.current && !demoMenuRef.current.contains(e.target)) {
+        setDemoDropdownOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   const handleLogout = () => {
     logout()
-    navigate('/')
+    setUserDropdownOpen(false)
     setMobileMenuOpen(false)
+    navigate('/')
   }
 
-  const linkClass = ({ isActive }) =>
-    `flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all duration-150 ${
-      isActive
-        ? 'bg-blue-50 text-blue-700 border border-blue-200 shadow-sm'
-        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-    }`
-
-  const mobileLinkClass = ({ isActive }) =>
-    `flex items-center gap-2.5 px-4 py-3 rounded-xl text-sm font-semibold transition-all ${
-      isActive
-        ? 'bg-blue-50 text-blue-700 border border-blue-200'
-        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-    }`
+  const handleQuickDemoLogin = async (role) => {
+    try {
+      if (role === 'CUSTOMER') {
+        await login('customer@enroute.com', 'Customer123!')
+        navigate('/my-bookings')
+      } else {
+        await login('driver@enroute.com', 'Driver123!')
+        navigate('/driver')
+      }
+      setDemoDropdownOpen(false)
+      setMobileMenuOpen(false)
+    } catch (e) {
+      console.error(e)
+    }
+  }
 
   const brandDestination = user ? (isDriver ? '/driver' : '/my-bookings') : '/'
 
   return (
-    <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur-md shadow-xs">
+    <header className="sticky top-0 z-40 border-b border-slate-200/80 bg-white/90 backdrop-blur-md transition-all">
       <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Brand Logo */}
-        <Link 
-          to={brandDestination} 
-          className="flex items-center gap-3 group"
+        <Link
+          to={brandDestination}
+          className="flex items-center gap-2.5 group transition-transform active:scale-95"
           onClick={() => setMobileMenuOpen(false)}
         >
-          <img
-            src="/hero.png"
-            alt="Enroute Logo"
-            className="h-10 w-auto max-w-[50px] object-contain transition duration-200 group-hover:scale-105"
-          />
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-tr from-blue-700 via-blue-600 to-indigo-600 text-white shadow-sm shadow-blue-500/30 transition-transform group-hover:scale-105">
+            <Truck className="h-5 w-5 stroke-[2.2]" />
+          </div>
           <div>
-            <div className="flex items-center gap-2">
-              <span className="text-xl font-display font-black tracking-tight text-slate-900">
-                ENROUTE
+            <div className="flex items-center gap-1">
+              <span className="text-xl font-bold tracking-tight text-slate-900">
+                Enroute<span className="text-blue-600">.</span>
               </span>
-              <span className="hidden rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-bold tracking-wider text-blue-700 border border-blue-200 md:inline-block">
+              <span className="hidden rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-semibold text-blue-700 sm:inline-block">
                 SIH 2026
               </span>
             </div>
-            <span className="hidden text-[10px] uppercase font-bold tracking-widest text-slate-500 sm:block -mt-1">
-              Move Freight, Not Air
+            <span className="hidden text-[10px] font-medium text-slate-500 sm:block -mt-1">
+              {t('brand_tagline', 'Move Freight, Not Air')}
             </span>
           </div>
         </Link>
 
-        {/* Desktop Navigation */}
-        <nav className="hidden items-center gap-1.5 md:flex">
-          <NavLink to="/routes" className={linkClass}>
-            <MapPin className="h-4 w-4" />
-            Browse Routes
+        {/* Center Desktop Navigation */}
+        <nav className="hidden items-center gap-1 md:flex">
+          <NavLink
+            to="/routes"
+            className={({ isActive }) =>
+              `inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold transition ${
+                isActive
+                  ? 'bg-blue-50 text-blue-700 font-bold'
+                  : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+              }`
+            }
+          >
+            <Compass className="h-3.5 w-3.5" />
+            {t('nav_browse', 'Browse Routes')}
           </NavLink>
 
-          {isDriver && (
-            <>
-              <NavLink to="/driver" className={linkClass}>
-                <Truck className="h-4 w-4" />
-                Driver Dashboard
-              </NavLink>
-            </>
-          )}
-
-          {isCustomer && (
-            <NavLink to="/my-bookings" className={linkClass}>
-              <Package className="h-4 w-4" />
-              My Bookings
+          {user && isCustomer && (
+            <NavLink
+              to="/my-bookings"
+              className={({ isActive }) =>
+                `inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold transition ${
+                  isActive
+                    ? 'bg-blue-50 text-blue-700 font-bold'
+                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                }`
+              }
+            >
+              <Package className="h-3.5 w-3.5" />
+              {t('nav_my_bookings', 'My Bookings')}
             </NavLink>
           )}
+
+          {user && isDriver && (
+            <NavLink
+              to="/driver"
+              className={({ isActive }) =>
+                `inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold transition ${
+                  isActive
+                    ? 'bg-blue-50 text-blue-700 font-bold'
+                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                }`
+              }
+            >
+              <Truck className="h-3.5 w-3.5" />
+              {t('nav_driver_terminal', 'Driver Terminal')}
+            </NavLink>
+          )}
+
+          {/* Quick Demo Login Fast Track Dropdown */}
+          <div className="relative inline-block" ref={demoMenuRef}>
+            <button
+              type="button"
+              onClick={() => setDemoDropdownOpen(!demoDropdownOpen)}
+              className="inline-flex items-center gap-1 rounded-lg border border-amber-200 bg-amber-50/70 px-2.5 py-1.5 text-xs font-semibold text-amber-800 transition hover:bg-amber-100"
+            >
+              <Zap className="h-3.5 w-3.5 text-amber-600 fill-amber-500" />
+              <span className="hidden lg:inline">1-Click Demo</span>
+              <ChevronDown className="h-3 w-3 opacity-60" />
+            </button>
+
+            {demoDropdownOpen && (
+              <div className="absolute left-0 mt-2 w-56 origin-top-left rounded-xl border border-slate-200 bg-white p-1.5 shadow-xl ring-1 ring-black/5 animate-in fade-in zoom-in-95 duration-100 z-50">
+                <div className="px-2.5 py-1.5 text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                  Instant Test Accounts
+                </div>
+                <button
+                  type="button"
+                  onClick={() => handleQuickDemoLogin('DRIVER')}
+                  className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-xs font-medium text-slate-700 transition hover:bg-blue-50 hover:text-blue-700"
+                >
+                  <div className="flex h-6 w-6 items-center justify-center rounded-md bg-blue-100 text-blue-700">
+                    <Truck className="h-3.5 w-3.5" />
+                  </div>
+                  <div className="text-left">
+                    <span className="font-semibold block">Driver (Rajesh Sharma)</span>
+                    <span className="text-[10px] text-slate-400">Dehradun ➔ Delhi Run</span>
+                  </div>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleQuickDemoLogin('CUSTOMER')}
+                  className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-xs font-medium text-slate-700 transition hover:bg-indigo-50 hover:text-indigo-700"
+                >
+                  <div className="flex h-6 w-6 items-center justify-center rounded-md bg-indigo-100 text-indigo-700">
+                    <Package className="h-3.5 w-3.5" />
+                  </div>
+                  <div className="text-left">
+                    <span className="font-semibold block">Shipper (Pooja Verma)</span>
+                    <span className="text-[10px] text-slate-400">Verma Textiles &amp; Cargo</span>
+                  </div>
+                </button>
+              </div>
+            )}
+          </div>
         </nav>
 
-        {/* Auth / Profile Area */}
-        <div className="hidden items-center gap-3 md:flex">
+        {/* Right Desktop Actions */}
+        <div className="hidden items-center gap-2.5 md:flex">
+          {/* Language Selector */}
+          <LanguageSelector variant="navbar" />
+
           {user ? (
-            <div className="flex items-center gap-3">
-              <Link
-                to="/profile"
-                className="flex items-center gap-2.5 rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 transition hover:border-slate-300 hover:bg-slate-100"
-              >
-                <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-600 font-bold text-white text-xs">
-                  {user.name?.charAt(0).toUpperCase() || 'U'}
-                </div>
-                <div className="text-left">
-                  <p className="text-xs font-bold leading-tight text-slate-900">{user.name}</p>
-                  <p className="text-[10px] font-medium text-slate-500 capitalize">
-                    {user.role?.toLowerCase()}
-                  </p>
-                </div>
-              </Link>
-              
+            <div className="relative inline-block" ref={userMenuRef}>
               <button
-                onClick={handleLogout}
-                className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-600 hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition"
-                title="Log Out"
+                type="button"
+                onClick={() => setUserDropdownOpen(!userDropdownOpen)}
+                className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-2.5 py-1.5 shadow-sm transition hover:border-slate-300 hover:bg-slate-50 focus:outline-none"
               >
-                <LogOut className="h-3.5 w-3.5" />
-                <span>Logout</span>
+                <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-600 text-xs font-bold text-white shadow-xs">
+                  {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
+                </div>
+                <div className="text-left hidden lg:block">
+                  <div className="text-xs font-semibold text-slate-800 leading-tight">
+                    {user.name || 'User'}
+                  </div>
+                  <div className="text-[10px] font-medium text-slate-500">
+                    {user.role === 'DRIVER' ? 'Fleet Driver' : 'Shipper'}
+                  </div>
+                </div>
+                <ChevronDown className="h-3.5 w-3.5 text-slate-400" />
               </button>
+
+              {userDropdownOpen && (
+                <div className="absolute right-0 mt-2 w-52 origin-top-right rounded-xl border border-slate-200 bg-white p-1.5 shadow-xl ring-1 ring-black/5 animate-in fade-in zoom-in-95 duration-100 z-50">
+                  <div className="border-b border-slate-100 px-3 py-2">
+                    <p className="text-xs font-semibold text-slate-800">{user.name}</p>
+                    <p className="text-[11px] text-slate-500 truncate">{user.email}</p>
+                  </div>
+                  <div className="py-1 space-y-0.5">
+                    <Link
+                      to="/profile"
+                      onClick={() => setUserDropdownOpen(false)}
+                      className="flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 hover:text-slate-900"
+                    >
+                      <UserIcon className="h-3.5 w-3.5 text-slate-500" />
+                      {t('nav_profile', 'Profile Settings')}
+                    </Link>
+                    {isDriver ? (
+                      <Link
+                        to="/driver"
+                        onClick={() => setUserDropdownOpen(false)}
+                        className="flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 hover:text-slate-900"
+                      >
+                        <Truck className="h-3.5 w-3.5 text-slate-500" />
+                        {t('nav_driver_terminal', 'Driver Terminal')}
+                      </Link>
+                    ) : (
+                      <Link
+                        to="/my-bookings"
+                        onClick={() => setUserDropdownOpen(false)}
+                        className="flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 hover:text-slate-900"
+                      >
+                        <Package className="h-3.5 w-3.5 text-slate-500" />
+                        {t('nav_my_bookings', 'My Bookings')}
+                      </Link>
+                    )}
+                  </div>
+                  <div className="border-t border-slate-100 pt-1">
+                    <button
+                      type="button"
+                      onClick={handleLogout}
+                      className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-rose-600 hover:bg-rose-50"
+                    >
+                      <LogOut className="h-3.5 w-3.5" />
+                      {t('nav_logout', 'Sign Out')}
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           ) : (
             <div className="flex items-center gap-2">
               <Link
                 to="/login"
-                className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition"
+                className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 hover:text-slate-900"
               >
                 <LogIn className="h-3.5 w-3.5" />
-                Sign In
+                {t('nav_login', 'Sign In')}
               </Link>
               <Link
                 to="/register"
-                className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-2 text-xs font-bold text-white shadow-md shadow-blue-600/20 hover:from-blue-700 hover:to-indigo-700 transition"
+                className="inline-flex items-center gap-1.5 rounded-xl bg-blue-600 px-3.5 py-2 text-xs font-semibold text-white shadow-sm shadow-blue-500/25 transition hover:bg-blue-700"
               >
-                Get Started
+                <Sparkles className="h-3.5 w-3.5" />
+                {t('nav_register', 'Get Started')}
               </Link>
             </div>
           )}
         </div>
 
         {/* Mobile Menu Button */}
-        <button
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 hover:text-slate-900 md:hidden"
-          aria-label="Toggle menu"
-        >
-          {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </button>
+        <div className="flex items-center gap-2 md:hidden">
+          <LanguageSelector variant="navbar" />
+          <button
+            type="button"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white p-2 text-slate-700 shadow-sm hover:bg-slate-50"
+            aria-label="Toggle Mobile Menu"
+          >
+            {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
+        </div>
       </div>
 
-      {/* Mobile Drawer Menu */}
+      {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="border-b border-slate-200 bg-white px-4 py-4 md:hidden animate-fade-in space-y-3 shadow-lg">
-          <nav className="space-y-1">
-            <NavLink to={brandDestination} end className={mobileLinkClass} onClick={() => setMobileMenuOpen(false)}>
-              {user ? 'My Dashboard' : 'Home'}
-            </NavLink>
-            <NavLink to="/routes" className={mobileLinkClass} onClick={() => setMobileMenuOpen(false)}>
-              <MapPin className="h-4 w-4" />
-              Browse Routes
-            </NavLink>
+        <div className="border-t border-slate-200 bg-white px-4 py-4 space-y-3 md:hidden animate-in slide-in-from-top-2 duration-150">
+          <div className="space-y-1">
+            <Link
+              to="/routes"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+            >
+              <Compass className="h-4 w-4 text-blue-600" />
+              {t('nav_browse', 'Browse Routes')}
+            </Link>
 
-            {isDriver && (
-              <NavLink to="/driver" className={mobileLinkClass} onClick={() => setMobileMenuOpen(false)}>
-                <Truck className="h-4 w-4" />
-                Driver Dashboard
-              </NavLink>
+            {user && isCustomer && (
+              <Link
+                to="/my-bookings"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+              >
+                <Package className="h-4 w-4 text-blue-600" />
+                {t('nav_my_bookings', 'My Bookings')}
+              </Link>
             )}
 
-            {isCustomer && (
-              <NavLink to="/my-bookings" className={mobileLinkClass} onClick={() => setMobileMenuOpen(false)}>
-                <Package className="h-4 w-4" />
-                My Bookings
-              </NavLink>
+            {user && isDriver && (
+              <Link
+                to="/driver"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+              >
+                <Truck className="h-4 w-4 text-blue-600" />
+                {t('nav_driver_terminal', 'Driver Terminal')}
+              </Link>
             )}
 
             {user && (
-              <NavLink to="/profile" className={mobileLinkClass} onClick={() => setMobileMenuOpen(false)}>
-                <UserIcon className="h-4 w-4" />
-                Profile Settings
-              </NavLink>
+              <Link
+                to="/profile"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+              >
+                <UserIcon className="h-4 w-4 text-blue-600" />
+                {t('nav_profile', 'Profile')}
+              </Link>
             )}
-          </nav>
+          </div>
 
-          <div className="border-t border-slate-200 pt-3">
+          <div className="border-t border-slate-100 pt-3 space-y-2">
+            <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+              Quick Test Login
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => handleQuickDemoLogin('DRIVER')}
+                className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-blue-200 bg-blue-50 px-2.5 py-2 text-xs font-semibold text-blue-700"
+              >
+                <Truck className="h-3.5 w-3.5" />
+                Driver Login
+              </button>
+              <button
+                type="button"
+                onClick={() => handleQuickDemoLogin('CUSTOMER')}
+                className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-indigo-200 bg-indigo-50 px-2.5 py-2 text-xs font-semibold text-indigo-700"
+              >
+                <Package className="h-3.5 w-3.5" />
+                Shipper Login
+              </button>
+            </div>
+          </div>
+
+          <div className="border-t border-slate-100 pt-3">
             {user ? (
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-bold text-slate-900">{user.name}</p>
-                  <p className="text-xs text-slate-500 capitalize">{user.role?.toLowerCase()}</p>
-                </div>
-                <button
-                  onClick={handleLogout}
-                  className="flex items-center gap-1.5 rounded-lg bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-600 border border-red-200"
-                >
-                  <LogOut className="h-3.5 w-3.5" />
-                  Logout
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="flex w-full items-center justify-center gap-2 rounded-xl border border-rose-200 bg-rose-50 px-4 py-2.5 text-xs font-semibold text-rose-600"
+              >
+                <LogOut className="h-4 w-4" />
+                {t('nav_logout', 'Sign Out')}
+              </button>
             ) : (
               <div className="grid grid-cols-2 gap-2">
                 <Link
                   to="/login"
-                  className="btn-secondary text-xs !py-2 text-center"
                   onClick={() => setMobileMenuOpen(false)}
+                  className="btn-secondary text-center text-xs"
                 >
-                  Sign In
+                  {t('nav_login', 'Sign In')}
                 </Link>
                 <Link
                   to="/register"
-                  className="btn-primary text-xs !py-2 text-center"
                   onClick={() => setMobileMenuOpen(false)}
+                  className="btn-primary text-center text-xs"
                 >
-                  Register
+                  {t('nav_register', 'Get Started')}
                 </Link>
               </div>
             )}

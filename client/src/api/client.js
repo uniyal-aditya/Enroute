@@ -6,7 +6,6 @@ const TOKEN_KEY = 'enroute_token'
 const getBaseUrl = () => {
   const envUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE
   if (envUrl) {
-    // strip trailing slash
     const cleanUrl = envUrl.replace(/\/+$/, '')
     return cleanUrl.endsWith('/api') ? cleanUrl : `${cleanUrl}/api`
   }
@@ -20,10 +19,18 @@ const api = axios.create({
   },
 })
 
+// Initialize auth header from storage on startup
+const initialToken = localStorage.getItem(TOKEN_KEY)
+if (initialToken) {
+  api.defaults.headers.common.Authorization = `Bearer ${initialToken}`
+}
+
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem(TOKEN_KEY)
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
+  } else {
+    delete config.headers.Authorization
   }
   return config
 })
@@ -32,15 +39,30 @@ api.interceptors.response.use(
   (res) => res,
   (err) => {
     if (err.response?.status === 401) {
-      localStorage.removeItem(TOKEN_KEY)
+      // Clear token only on unauthorized protected calls (not initial login failures)
+      const url = err.config?.url || ''
+      if (!url.includes('/auth/login')) {
+        localStorage.removeItem(TOKEN_KEY)
+        delete api.defaults.headers.common.Authorization
+      }
     }
     return Promise.reject(err)
   }
 )
 
 export const getToken = () => localStorage.getItem(TOKEN_KEY)
-export const setToken = (token) => localStorage.setItem(TOKEN_KEY, token)
-export const clearToken = () => localStorage.removeItem(TOKEN_KEY)
+
+export const setToken = (token) => {
+  if (token) {
+    localStorage.setItem(TOKEN_KEY, token)
+    api.defaults.headers.common.Authorization = `Bearer ${token}`
+  }
+}
+
+export const clearToken = () => {
+  localStorage.removeItem(TOKEN_KEY)
+  delete api.defaults.headers.common.Authorization
+}
 
 export const getApiError = (err, fallback = 'Something went wrong. Please check your connection.') => {
   if (err.code === 'ERR_NETWORK' || !err.response) {

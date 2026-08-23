@@ -1,31 +1,19 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
-import { Truck, Package, User, Mail, Phone, Lock, Building, ArrowRight } from 'lucide-react'
+import { Truck, Package, User, Mail, Phone, Lock, Building2, Sparkles } from 'lucide-react'
 import { useAuth } from '../context/AuthContext.jsx'
+import { useTranslation } from '../context/LanguageContext.jsx'
 import { getApiError } from '../api/client'
-
-const ROLES = [
-  {
-    value: 'CUSTOMER',
-    icon: Package,
-    title: 'I Need to Ship Goods',
-    desc: 'Book spare space on trucks already making the journey',
-  },
-  {
-    value: 'DRIVER',
-    icon: Truck,
-    title: 'I Have a Truck / Fleet',
-    desc: 'List your route and monetize unused cargo capacity',
-  },
-]
+import DemoLoginBanner from '../components/DemoLoginBanner.jsx'
 
 export default function Register() {
-  const { user, register } = useAuth()
+  const { user, register, login } = useAuth()
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const [submitting, setSubmitting] = useState(false)
 
-  // When already logged in, redirect directly to dashboard
+  // Redirect if already logged in
   useEffect(() => {
     if (user) {
       const dest = user.role === 'DRIVER' ? '/driver' : '/my-bookings'
@@ -67,23 +55,54 @@ export default function Register() {
       const newUser = await register(payload)
       navigate(newUser?.role === 'DRIVER' ? '/driver' : '/my-bookings', { replace: true })
     } catch (err) {
-      toast.error(getApiError(err, 'Registration failed'))
+      toast.error(getApiError(err, 'Registration failed. Please check your inputs.'))
     } finally {
       setSubmitting(false)
     }
   }
 
+  const handleFill = async (email, password) => {
+    try {
+      await login(email, password)
+    } catch (err) {
+      toast.error('Could not auto-login')
+    }
+  }
+
+  const ROLES = [
+    {
+      value: 'CUSTOMER',
+      icon: Package,
+      title: t('register_role_shipper', 'Ship Goods / Cargo'),
+      desc: t('register_role_shipper_desc', 'Book spare capacity on trucks already traveling your route.'),
+    },
+    {
+      value: 'DRIVER',
+      icon: Truck,
+      title: t('register_role_driver', 'I Have a Truck / Fleet'),
+      desc: t('register_role_driver_desc', 'List unused cargo space on scheduled trips and earn extra revenue.'),
+    },
+  ]
+
   return (
-    <div className="mx-auto mt-6 max-w-lg py-6">
-      <div className="card p-6 sm:p-8 space-y-6">
-        <div className="space-y-1">
-          <h1 className="text-2xl font-extrabold text-slate-900">Join Enroute</h1>
+    <div className="mx-auto mt-4 max-w-lg py-6">
+      {/* 1-Click Fast Track Demo Banner */}
+      <DemoLoginBanner onFill={handleFill} />
+
+      <div className="card p-6 sm:p-8 space-y-6 shadow-md border-slate-200/90">
+        <div className="space-y-1 border-b border-slate-100 pb-4 text-center">
+          <div className="mx-auto flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 mb-2">
+            <Sparkles className="h-5 w-5 stroke-[2.2]" />
+          </div>
+          <h1 className="text-2xl font-bold text-slate-900">
+            {t('register_title', 'Create Your Enroute Account')}
+          </h1>
           <p className="text-xs text-slate-500">
-            Create an account to start shipping freight or publishing truck routes.
+            {t('register_sub', 'Join thousands of shippers and truck drivers optimizing logistics across India.')}
           </p>
         </div>
 
-        {/* Role Toggle */}
+        {/* Role Selection */}
         <div className="space-y-1.5">
           <label className="label">Select Account Type</label>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -95,16 +114,16 @@ export default function Register() {
                   type="button"
                   key={r.value}
                   onClick={() => setForm({ ...form, role: r.value })}
-                  className={`rounded-2xl border p-4 text-left transition duration-150 ${
+                  className={`rounded-2xl border p-4 text-left transition-all ${
                     isSelected
-                      ? 'border-blue-600 bg-blue-50/80 ring-2 ring-blue-500/20'
-                      : 'border-slate-200 bg-slate-50/60 hover:border-slate-300 hover:bg-slate-50'
+                      ? 'border-blue-500 bg-blue-50/60 shadow-sm ring-2 ring-blue-500/20'
+                      : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
                   }`}
                 >
-                  <Icon
-                    className={`h-5 w-5 mb-2 ${isSelected ? 'text-blue-600' : 'text-slate-400'}`}
-                  />
-                  <span className={`block text-xs font-bold ${isSelected ? 'text-blue-900' : 'text-slate-900'}`}>{r.title}</span>
+                  <Icon className={`h-5 w-5 mb-2 ${isSelected ? 'text-blue-600' : 'text-slate-500'}`} />
+                  <span className={`block text-xs font-bold ${isSelected ? 'text-blue-900' : 'text-slate-800'}`}>
+                    {r.title}
+                  </span>
                   <span className="mt-1 block text-[11px] text-slate-500 leading-tight">
                     {r.desc}
                   </span>
@@ -117,7 +136,7 @@ export default function Register() {
         <form onSubmit={onSubmit} className="space-y-4">
           <div>
             <label className="label" htmlFor="name">
-              Full Name / Contact Person
+              {t('register_name', 'Full Name / Contact Person')}
             </label>
             <div className="relative">
               <User className="pointer-events-none absolute left-3.5 top-3 h-4 w-4 text-slate-400" />
@@ -136,7 +155,7 @@ export default function Register() {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label className="label" htmlFor="email">
-                Email Address
+                {t('login_email', 'Email Address')}
               </label>
               <div className="relative">
                 <Mail className="pointer-events-none absolute left-3.5 top-3 h-4 w-4 text-slate-400" />
@@ -155,7 +174,7 @@ export default function Register() {
 
             <div>
               <label className="label" htmlFor="phone">
-                Mobile Number
+                {t('register_phone', 'Phone / Mobile Number')}
               </label>
               <div className="relative">
                 <Phone className="pointer-events-none absolute left-3.5 top-3 h-4 w-4 text-slate-400" />
@@ -163,7 +182,7 @@ export default function Register() {
                   id="phone"
                   required
                   minLength={6}
-                  maxLength={15}
+                  maxLength={20}
                   placeholder="10-digit mobile"
                   className="input !pl-10"
                   value={form.phone}
@@ -175,7 +194,7 @@ export default function Register() {
 
           <div>
             <label className="label" htmlFor="password">
-              Password (min. 6 characters)
+              {t('login_password', 'Password')} (min. 6 characters)
             </label>
             <div className="relative">
               <Lock className="pointer-events-none absolute left-3.5 top-3 h-4 w-4 text-slate-400" />
@@ -194,11 +213,11 @@ export default function Register() {
           </div>
 
           <div>
-            <label className="label">Company / Business Name (Optional)</label>
+            <label className="label">{t('register_company', 'Company / Business Name (Optional)')}</label>
             <div className="relative">
-              <Building className="pointer-events-none absolute left-3.5 top-3 h-4 w-4 text-slate-400" />
+              <Building2 className="pointer-events-none absolute left-3.5 top-3 h-4 w-4 text-slate-400" />
               <input
-                maxLength={100}
+                maxLength={150}
                 placeholder="e.g. Garhwal Logistics / Verma Handicrafts"
                 className="input !pl-10"
                 value={form.company_name}
@@ -207,42 +226,36 @@ export default function Register() {
             </div>
           </div>
 
-          {/* Driver specific dynamic fleet fields */}
+          {/* Driver Fleet Details */}
           {form.role === 'DRIVER' && (
-            <div className="rounded-2xl bg-slate-50 p-4 border border-slate-200 space-y-3">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-blue-700 flex items-center gap-1.5">
-                <Truck className="h-3.5 w-3.5" />
-                Vehicle Details (Optional)
+            <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4 space-y-3">
+              <span className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                <Truck className="h-3.5 w-3.5 text-blue-600" />
+                Fleet Vehicle Specifications (Optional)
               </span>
 
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-                <div>
-                  <input
-                    maxLength={30}
-                    placeholder="Reg. No. (e.g. UK-07-TA)"
-                    className="input text-xs"
-                    value={form.vehicle_number}
-                    onChange={set('vehicle_number')}
-                  />
-                </div>
-                <div>
-                  <input
-                    maxLength={50}
-                    placeholder="Truck (e.g. Tata 407)"
-                    className="input text-xs"
-                    value={form.truck_type}
-                    onChange={set('truck_type')}
-                  />
-                </div>
-                <div>
-                  <input
-                    maxLength={50}
-                    placeholder="Capacity (e.g. 2.5T)"
-                    className="input text-xs"
-                    value={form.truck_capacity}
-                    onChange={set('truck_capacity')}
-                  />
-                </div>
+              <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-3">
+                <input
+                  maxLength={50}
+                  placeholder="Reg. No. (UK-07-TA)"
+                  className="input text-xs bg-white"
+                  value={form.vehicle_number}
+                  onChange={set('vehicle_number')}
+                />
+                <input
+                  maxLength={100}
+                  placeholder="Truck (Tata 407)"
+                  className="input text-xs bg-white"
+                  value={form.truck_type}
+                  onChange={set('truck_type')}
+                />
+                <input
+                  maxLength={50}
+                  placeholder="Cap. (2.5 Tons)"
+                  className="input text-xs bg-white"
+                  value={form.truck_capacity}
+                  onChange={set('truck_capacity')}
+                />
               </div>
             </div>
           )}
@@ -250,16 +263,17 @@ export default function Register() {
           <button
             type="submit"
             disabled={submitting}
-            className="btn-primary w-full !py-3 text-xs font-bold"
+            className="btn-primary w-full py-3 text-xs font-bold"
           >
-            {submitting ? 'Creating Account…' : 'Complete Registration'}
+            <Sparkles className="h-4 w-4" />
+            {submitting ? 'Creating Account…' : t('register_btn', 'Complete Registration')}
           </button>
         </form>
 
         <div className="border-t border-slate-100 pt-4 text-center text-xs text-slate-500">
-          Already registered?{' '}
-          <Link to="/login" className="font-bold text-blue-600 hover:text-blue-700 transition">
-            Sign In
+          {t('register_already_account', 'Already have an account?')}{' '}
+          <Link to="/login" className="font-semibold text-blue-600 hover:underline">
+            {t('nav_login', 'Sign In')}
           </Link>
         </div>
       </div>

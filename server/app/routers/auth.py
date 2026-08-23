@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 
 from app.dependencies.database import get_db
 from app.dependencies.auth import get_current_user
@@ -14,11 +15,11 @@ router = APIRouter(prefix="/api/auth", tags=["Authentication"])
 @router.post("/register/", response_model=Token, status_code=status.HTTP_201_CREATED, include_in_schema=False)
 def register(payload: UserRegister, db: Session = Depends(get_db)):
     clean_email = str(payload.email).strip().lower()
-    existing = db.query(User).filter(User.email.ilike(clean_email)).first()
+    existing = db.query(User).filter(func.lower(User.email) == clean_email).first()
     if existing:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="An account with this email already exists",
+            detail="An account with this email address already exists.",
         )
 
     user = User(
@@ -27,11 +28,11 @@ def register(payload: UserRegister, db: Session = Depends(get_db)):
         password_hash=hash_password(str(payload.password)),
         phone=str(payload.phone).strip(),
         role=payload.role,
-        vehicle_number=payload.vehicle_number.strip() if payload.vehicle_number and payload.vehicle_number.strip() else None,
-        truck_type=payload.truck_type.strip() if payload.truck_type and payload.truck_type.strip() else None,
-        truck_capacity=payload.truck_capacity.strip() if payload.truck_capacity and payload.truck_capacity.strip() else None,
-        company_name=payload.company_name.strip() if payload.company_name and payload.company_name.strip() else None,
-        bio=payload.bio.strip() if payload.bio and payload.bio.strip() else None,
+        vehicle_number=payload.vehicle_number,
+        truck_type=payload.truck_type,
+        truck_capacity=payload.truck_capacity,
+        company_name=payload.company_name,
+        bio=payload.bio,
     )
     db.add(user)
     db.commit()
@@ -54,20 +55,21 @@ async def login(
     email = None
     password = None
 
-    # Handle both JSON body and form-urlencoded
-    content_type = request.headers.get("content-type", "")
-    if "application/json" in content_type:
-        try:
-            body = await request.json()
+    # Try parsing JSON body first
+    try:
+        body = await request.json()
+        if isinstance(body, dict):
             email = body.get("email") or body.get("username")
             password = body.get("password")
-        except Exception:
-            pass
-    else:
+    except Exception:
+        pass
+
+    # Fallback to form data (e.g. OAuth2 form or urlencoded)
+    if not email or not password:
         try:
             form = await request.form()
-            email = form.get("username") or form.get("email")
-            password = form.get("password")
+            email = form.get("username") or form.get("email") or email
+            password = form.get("password") or password
         except Exception:
             pass
 
@@ -79,12 +81,12 @@ async def login(
 
     clean_email = str(email).strip().lower()
     clean_pwd = str(password)
-    user = db.query(User).filter(User.email.ilike(clean_email)).first()
+    user = db.query(User).filter(func.lower(User.email) == clean_email).first()
 
     if not user or not verify_password(clean_pwd, user.password_hash):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect email or password",
+            detail="Incorrect email or password. Please verify your credentials.",
             headers={"WWW-Authenticate": "Bearer"},
         )
 

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import toast from 'react-hot-toast'
-import { User, Truck, ShieldCheck, Save, Mail, Phone, Building } from 'lucide-react'
+import { User, Truck, ShieldCheck, Save, Mail, Phone, Building2 } from 'lucide-react'
 import { useAuth } from '../context/AuthContext.jsx'
 import { getApiError } from '../api/client'
 
@@ -33,31 +33,37 @@ export default function Profile() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6 py-4">
-      <div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
+    <div className="mx-auto max-w-2xl space-y-6 py-2">
+      <div className="border-b border-slate-200/80 pb-3">
+        <div className="flex items-center gap-2">
+          <span className="h-2 w-2 rounded-full bg-blue-600" />
+          <span className="text-xs font-semibold uppercase tracking-wider text-blue-600">
+            Account Management
+          </span>
+        </div>
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">
           Account Profile &amp; Settings
         </h1>
-        <p className="text-xs sm:text-sm text-slate-600 mt-0.5">
-          Manage your verified {isDriver ? 'Driver' : 'Customer'} logistics profile and contact details.
+        <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
+          Manage your verified {isDriver ? 'Fleet Driver' : 'Shipper'} details and contact information.
         </p>
       </div>
 
-      <div className="card p-6 sm:p-8 space-y-6">
+      <div className="card p-6 sm:p-8 space-y-6 shadow-sm border-slate-200/90">
         {/* Top Header Card */}
         <div className="flex items-center gap-4 border-b border-slate-100 pb-6">
-          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-2xl font-black text-white shadow-md shadow-blue-500/20">
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-600 text-xl font-bold text-white shadow-sm">
             {user?.name?.charAt(0) || 'U'}
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-xl font-bold text-slate-900">{user?.name}</h2>
-              <span className="badge bg-blue-50 text-blue-700 border border-blue-200">
-                {user?.role}
+              <h2 className="text-lg font-bold text-slate-900">{user?.name}</h2>
+              <span className="rounded-full bg-blue-50 px-2.5 py-0.5 text-[11px] font-semibold text-blue-700">
+                {user?.role === 'DRIVER' ? 'Fleet Driver' : 'Shipper'}
               </span>
             </div>
-            <p className="text-xs text-slate-500 mt-0.5 flex items-center gap-1.5">
-              <Mail className="h-3.5 w-3.5" />
+            <p className="text-xs text-slate-500 mt-1 flex items-center gap-1.5">
+              <Mail className="h-3.5 w-3.5 text-slate-400" />
               {user?.email}
             </p>
           </div>
@@ -80,7 +86,7 @@ export default function Profile() {
               <input
                 required
                 minLength={6}
-                maxLength={15}
+                maxLength={20}
                 className="input"
                 value={form.phone}
                 onChange={set('phone')}
@@ -91,48 +97,48 @@ export default function Profile() {
           <div>
             <label className="label">Company / Business Name (Optional)</label>
             <input
-              maxLength={100}
+              maxLength={150}
               className="input"
-              placeholder="e.g. Garhwal Freight Logistics or Verma Textiles"
+              placeholder="e.g. Verma Handicrafts / Garhwal Freight"
               value={form.company_name}
               onChange={set('company_name')}
             />
           </div>
 
-          {/* Driver specific vehicle details */}
+          {/* Driver Fleet Details */}
           {isDriver && (
-            <div className="rounded-2xl bg-slate-50 p-5 border border-slate-200 space-y-4">
-              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-blue-700">
-                <Truck className="h-4 w-4" />
-                Vehicle &amp; Truck Fleet Details
+            <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-5 space-y-4">
+              <div className="text-xs font-bold text-slate-800 flex items-center gap-2">
+                <Truck className="h-4 w-4 text-blue-600" />
+                Fleet Vehicle Specifications
               </div>
 
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                 <div>
                   <label className="label">Vehicle Reg. No.</label>
                   <input
-                    maxLength={30}
-                    className="input"
+                    maxLength={50}
+                    className="input bg-white text-xs"
                     placeholder="e.g. UK-07-TA-4521"
                     value={form.vehicle_number}
                     onChange={set('vehicle_number')}
                   />
                 </div>
                 <div>
-                  <label className="label">Truck Model / Type</label>
+                  <label className="label">Truck Type</label>
                   <input
-                    maxLength={50}
-                    className="input"
+                    maxLength={100}
+                    className="input bg-white text-xs"
                     placeholder="e.g. Tata 407"
                     value={form.truck_type}
                     onChange={set('truck_type')}
                   />
                 </div>
                 <div>
-                  <label className="label">Max Payload Capacity</label>
+                  <label className="label">Rated Payload</label>
                   <input
                     maxLength={50}
-                    className="input"
+                    className="input bg-white text-xs"
                     placeholder="e.g. 2.5 Tons"
                     value={form.truck_capacity}
                     onChange={set('truck_capacity')}
@@ -143,25 +149,27 @@ export default function Profile() {
           )}
 
           <div>
-            <label className="label">About / Bio / Operating Corridors</label>
+            <label className="label">Bio / Operational Overview (Optional)</label>
             <textarea
               rows={3}
-              maxLength={1000}
+              maxLength={2000}
               className="input"
-              placeholder="e.g. Regular regional freight runner across Uttarakhand, Delhi NCR, and UP highways."
+              placeholder="Tell senders or transporters about your regular transit corridors, reliability, or business background."
               value={form.bio}
               onChange={set('bio')}
             />
           </div>
 
-          <button
-            type="submit"
-            disabled={submitting}
-            className="btn-primary !py-2.5 px-6 text-xs font-bold inline-flex"
-          >
-            <Save className="h-4 w-4" />
-            {submitting ? 'Saving Changes…' : 'Save Profile Changes'}
-          </button>
+          <div className="pt-2">
+            <button
+              type="submit"
+              disabled={submitting}
+              className="btn-primary w-full py-2.5 text-xs font-bold"
+            >
+              <Save className="h-4 w-4" />
+              {submitting ? 'Saving Changes…' : 'Save Profile Details'}
+            </button>
+          </div>
         </form>
       </div>
     </div>

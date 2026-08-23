@@ -1,32 +1,29 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import toast from 'react-hot-toast'
-import { 
-  ArrowLeft, 
-  Calendar, 
-  MapPin, 
-  Truck, 
-  ShieldCheck, 
-  PhoneCall, 
-  MessageSquare, 
-  User, 
-  Clock, 
-  Package, 
-  Star, 
-  AlertCircle, 
-  Info,
-  TrendingUp 
+import {
+  ArrowLeft,
+  ShieldCheck,
+  PhoneCall,
+  MessageSquare,
+  Clock,
+  Package,
+  Calendar,
+  MapPin,
+  Truck,
+  IndianRupee,
+  CheckCircle2,
+  AlertCircle,
 } from 'lucide-react'
 import api, { getApiError } from '../api/client'
 import { useAuth } from '../context/AuthContext.jsx'
 import RouteMap from '../components/RouteMap.jsx'
 import StatusTimeline from '../components/StatusTimeline.jsx'
-import { 
-  formatDateTime, 
-  formatDate, 
-  StatusBadge, 
-  whatsappLink, 
-  phoneCallLink 
+import {
+  formatDateTime,
+  StatusBadge,
+  whatsappLink,
+  phoneCallLink,
 } from '../utils/format.jsx'
 
 function BookingRequestForm({ listing, onBooked }) {
@@ -43,7 +40,7 @@ function BookingRequestForm({ listing, onBooked }) {
     setSubmitting(true)
     try {
       await api.post('/bookings/', { route_id: listing.id, ...form })
-      toast.success('Booking request sent to driver!')
+      toast.success('Booking request dispatched to driver!')
       onBooked()
     } catch (err) {
       toast.error(getApiError(err, 'Could not submit booking request'))
@@ -56,7 +53,7 @@ function BookingRequestForm({ listing, onBooked }) {
     <form onSubmit={onSubmit} className="space-y-4">
       <div className="space-y-3">
         <div>
-          <label className="label">Pickup Address / Area</label>
+          <label className="label">Pickup Address / Hub</label>
           <input
             required
             maxLength={200}
@@ -68,24 +65,24 @@ function BookingRequestForm({ listing, onBooked }) {
         </div>
 
         <div>
-          <label className="label">Drop-off Address / Area</label>
+          <label className="label">Drop-off Address / Warehouse</label>
           <input
             required
             maxLength={200}
             className="input"
-            placeholder="e.g. Okhla Phase 3 Warehouse, Delhi"
+            placeholder="e.g. Okhla Phase 3 Warehouse, New Delhi"
             value={form.drop_location}
             onChange={(e) => setForm({ ...form, drop_location: e.target.value })}
           />
         </div>
 
         <div>
-          <label className="label">Goods / Cargo Description</label>
+          <label className="label">Cargo / Goods Description</label>
           <textarea
             required
             rows={2}
             maxLength={500}
-            placeholder="e.g. 4 cartons of packaged electronics, fragile, dry cargo"
+            placeholder="e.g. 4 cartons of packaged electronics (fragile, keep dry)"
             className="input"
             value={form.goods_description}
             onChange={(e) => setForm({ ...form, goods_description: e.target.value })}
@@ -93,11 +90,11 @@ function BookingRequestForm({ listing, onBooked }) {
         </div>
 
         <div>
-          <label className="label">Estimated Weight / Volume</label>
+          <label className="label">Estimated Weight / Quantity</label>
           <input
             required
             maxLength={50}
-            placeholder="e.g. ~80 kg (2 medium cartons)"
+            placeholder="e.g. ~80 kg / 2 cartons"
             className="input"
             value={form.estimated_weight}
             onChange={(e) => setForm({ ...form, estimated_weight: e.target.value })}
@@ -105,456 +102,302 @@ function BookingRequestForm({ listing, onBooked }) {
         </div>
       </div>
 
-      <div className="rounded-xl bg-slate-50 border border-slate-200 p-3 text-xs text-slate-600">
-        <p className="flex items-center gap-1.5 text-slate-800 font-semibold mb-0.5">
-          <Info className="h-3.5 w-3.5 text-blue-600" />
-          Direct Coordination Notice:
-        </p>
-        Driver contact will be disclosed once the driver accepts your shipment. Payments are handled offline upon pickup.
-      </div>
-
-      <button type="submit" disabled={submitting} className="btn-primary w-full !py-3">
-        {submitting ? 'Submitting Request…' : 'Request Delivery Space'}
+      <button
+        type="submit"
+        disabled={submitting}
+        className="btn-primary w-full py-3 text-xs font-bold"
+      >
+        <Package className="h-4 w-4" />
+        {submitting ? 'Dispatching Request…' : 'Submit Space Booking Request'}
       </button>
+
+      <p className="text-center text-[11px] text-slate-500">
+        No payment is charged now. Driver contact and direct handover are unlocked upon confirmation.
+      </p>
     </form>
   )
 }
 
 export default function ListingDetail() {
   const { id } = useParams()
-  const { user } = useAuth()
+  const { user, isDriver } = useAuth()
   const [listing, setListing] = useState(null)
   const [loading, setLoading] = useState(true)
-  const [notFound, setNotFound] = useState(false)
-  const [myBooking, setMyBooking] = useState(undefined)
-  const [showRetryForm, setShowRetryForm] = useState(false)
+  const [myBooking, setMyBooking] = useState(null)
 
-  const loadListing = () => {
+  const loadData = () => {
+    setLoading(true)
     api
       .get(`/routes/${id}`)
       .then((res) => setListing(res.data))
-      .catch(() => setNotFound(true))
+      .catch((err) => toast.error(getApiError(err, 'Could not load route details')))
       .finally(() => setLoading(false))
-  }
 
-  const loadMyBookings = () => {
-    if (user?.role !== 'CUSTOMER') return
-    api
-      .get('/bookings/my-bookings')
-      .then((res) => {
-        const bookingsList = Array.isArray(res.data) ? res.data : []
-        const found = bookingsList.find((b) => b.route_id === Number(id))
-        setMyBooking(found || null)
-      })
-      .catch(() => setMyBooking(null))
+    if (user && user.role === 'CUSTOMER') {
+      api
+        .get('/bookings/my-bookings')
+        .then((res) => {
+          if (Array.isArray(res.data)) {
+            const matched = res.data.find((b) => b.route_id === Number(id))
+            setMyBooking(matched || null)
+          }
+        })
+        .catch(() => {})
+    }
   }
 
   useEffect(() => {
-    loadListing()
-  }, [id])
-
-  useEffect(() => {
-    loadMyBookings()
+    loadData()
   }, [id, user])
 
   if (loading) {
     return (
-      <div className="py-24 text-center space-y-3">
-        <div className="h-8 w-8 mx-auto animate-spin rounded-full border-2 border-blue-600 border-t-transparent" />
-        <p className="text-xs text-slate-500">Loading route details…</p>
+      <div className="card my-12 py-20 text-center text-slate-400 space-y-3">
+        <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-blue-600 border-t-transparent" />
+        <p className="text-xs font-medium">Loading corridor intelligence…</p>
       </div>
     )
   }
 
-  if (notFound || !listing) {
+  if (!listing) {
     return (
-      <div className="card mx-auto mt-12 max-w-md p-8 text-center space-y-4">
-        <AlertCircle className="mx-auto h-12 w-12 text-slate-400" />
-        <h2 className="text-lg font-bold text-slate-900">Route not found</h2>
-        <p className="text-xs text-slate-500">
-          This route listing may have been cancelled by the driver or the link is invalid.
-        </p>
-        <Link to="/routes" className="btn-primary inline-flex text-xs">
-          <ArrowLeft className="h-3.5 w-3.5" />
-          Browse Active Routes
+      <div className="card my-12 py-16 text-center space-y-4">
+        <AlertCircle className="mx-auto h-10 w-10 text-rose-500" />
+        <h2 className="text-xl font-bold text-slate-900">Corridor Not Found</h2>
+        <p className="text-xs text-slate-500">This route listing may have been completed or removed.</p>
+        <Link to="/routes" className="btn-secondary inline-flex text-xs">
+          <ArrowLeft className="h-4 w-4" />
+          Back to Routes
         </Link>
       </div>
     )
   }
 
-  const isOwner = user?.id === listing.driver_id
+  const isMyListing = user && user.id === listing.driver_id
 
   return (
-    <div className="space-y-6 py-4">
-      {/* Breadcrumb back */}
-      <Link
-        to="/routes"
-        className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 hover:text-blue-700 transition"
-      >
-        <ArrowLeft className="h-3.5 w-3.5" />
-        Back to all routes
-      </Link>
+    <div className="space-y-6 py-2">
+      {/* Top Breadcrumb */}
+      <div>
+        <Link
+          to="/routes"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-blue-600 transition"
+        >
+          <ArrowLeft className="h-3.5 w-3.5" />
+          Back to All Corridors
+        </Link>
+      </div>
 
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 items-start">
-        {/* Left 7 Cols: Route Visuals, Specs & Driver Info */}
-        <div className="lg:col-span-7 space-y-6">
-          {/* Main Route Card */}
-          <div className="card p-6 space-y-6">
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <div>
-                <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
-                  {listing.origin} → {listing.destination}
-                </h1>
-                <p className="text-xs text-slate-500 mt-1">
-                  Trip ID #{listing.id} · Listed {formatDateTime(listing.created_at)}
-                </p>
+      {/* Main Grid: Details on Left, Booking/Contact Card on Right */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+        {/* Left Column: Corridor Header, Map, Description, Specs */}
+        <div className="space-y-6 lg:col-span-8">
+          {/* Header Card */}
+          <div className="card p-6 shadow-sm border-slate-200/90 space-y-4">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <StatusBadge status={listing.status} />
+                <span className="rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-semibold text-blue-700">
+                  {Math.round(listing.distance_km)} km Corridor
+                </span>
               </div>
-              <StatusBadge status={listing.status} />
+              <span className="flex items-center gap-1.5 text-xs font-semibold text-slate-500">
+                <Calendar className="h-3.5 w-3.5 text-slate-400" />
+                Departure: {formatDateTime(listing.departure_date)}
+              </span>
             </div>
 
-            {/* Interactive Route Map */}
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
+                {listing.origin} ➔ {listing.destination}
+              </h1>
+              <p className="text-xs text-slate-500 mt-1">
+                Interstate highway transit via active freight transport corridor.
+              </p>
+            </div>
+
+            {/* Spec Badges */}
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 pt-2">
+              <div className="rounded-xl bg-slate-50 p-3 text-left border border-slate-100">
+                <div className="text-[11px] font-semibold text-slate-500 flex items-center gap-1">
+                  <Truck className="h-3.5 w-3.5 text-blue-600" />
+                  Vehicle Type
+                </div>
+                <div className="text-sm font-bold text-slate-800 mt-0.5">{listing.truck_type}</div>
+              </div>
+
+              <div className="rounded-xl bg-slate-50 p-3 text-left border border-slate-100">
+                <div className="text-[11px] font-semibold text-slate-500 flex items-center gap-1">
+                  <Package className="h-3.5 w-3.5 text-indigo-600" />
+                  Total Capacity
+                </div>
+                <div className="text-sm font-bold text-slate-800 mt-0.5">{listing.truck_capacity}</div>
+              </div>
+
+              <div className="rounded-xl bg-emerald-50/70 p-3 text-left border border-emerald-100 col-span-2 sm:col-span-1">
+                <div className="text-[11px] font-semibold text-emerald-800 flex items-center gap-1">
+                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
+                  Spare Available
+                </div>
+                <div className="text-sm font-extrabold text-emerald-700 mt-0.5">
+                  {listing.available_space}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Interactive Route Map */}
+          <div className="space-y-2">
+            <h2 className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
+              <MapPin className="h-4 w-4 text-blue-600" />
+              Highway Route Corridor &amp; Waypoints
+            </h2>
             <RouteMap
               origin={{ lat: listing.origin_lat, lng: listing.origin_lng }}
               destination={{ lat: listing.dest_lat, lng: listing.dest_lng }}
               originLabel={listing.origin}
               destinationLabel={listing.destination}
-              className="h-72 sm:h-80"
+              className="h-80 w-full"
             />
-
-            {/* Core Trip Specs Grid */}
-            <div className="grid grid-cols-2 gap-4 rounded-2xl bg-slate-50 border border-slate-200 p-4 text-xs sm:grid-cols-3">
-              <div>
-                <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">
-                  Departure Time
-                </span>
-                <p className="mt-1 font-bold text-slate-900 text-sm">
-                  {formatDateTime(listing.departure_date)}
-                </p>
-              </div>
-
-              <div>
-                <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">
-                  Total Distance
-                </span>
-                <p className="mt-1 font-bold text-slate-900 text-sm">
-                  {Math.round(listing.distance_km)} km
-                </p>
-              </div>
-
-              <div>
-                <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">
-                  Freight Rate
-                </span>
-                <p className="mt-1 font-bold text-blue-600 text-sm font-display">
-                  ₹{listing.rate_per_km}/km
-                </p>
-                {listing.flat_rate && (
-                  <span className="text-[10px] text-emerald-700 font-semibold">₹{listing.flat_rate} flat</span>
-                )}
-              </div>
-
-              <div>
-                <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">
-                  Truck Model
-                </span>
-                <p className="mt-1 font-bold text-slate-800">{listing.truck_type}</p>
-              </div>
-
-              <div>
-                <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">
-                  Total Capacity
-                </span>
-                <p className="mt-1 font-bold text-slate-800">{listing.truck_capacity}</p>
-              </div>
-
-              <div>
-                <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">
-                  Available Space
-                </span>
-                <p className="mt-1 font-bold text-emerald-700">{listing.available_space}</p>
-              </div>
-            </div>
-
-            {/* Shared Freight vs Courier Savings Calculator */}
-            <div className="rounded-2xl border border-emerald-200 bg-gradient-to-r from-emerald-50/70 via-white to-blue-50/70 p-4 space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
-                  <TrendingUp className="h-4 w-4 text-emerald-600" />
-                  Estimated Cost Comparison (किराया बचत तुलना)
-                </span>
-                <span className="rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-black px-2.5 py-0.5">
-                  Save 40–60%
-                </span>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                <div className="rounded-xl border border-emerald-200 bg-white p-3 space-y-0.5">
-                  <span className="text-[10px] uppercase font-bold text-emerald-700">Enroute Shared Backhaul</span>
-                  <div className="text-lg font-black text-slate-900 font-display">
-                    ₹{Math.round(listing.distance_km * listing.rate_per_km).toLocaleString()}
-                    <span className="text-[10px] text-slate-500 font-normal ml-1">approx shared trip</span>
-                  </div>
-                  <p className="text-[10px] text-emerald-600 font-medium">✓ Real-time space sharing · Direct driver contact</p>
-                </div>
-
-                <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 space-y-0.5 opacity-90">
-                  <span className="text-[10px] uppercase font-bold text-slate-500">Standalone Courier Cargo</span>
-                  <div className="text-lg font-bold text-slate-400 font-display line-through">
-                    ₹{Math.round(listing.distance_km * listing.rate_per_km * 2.3).toLocaleString()}
-                  </div>
-                  <p className="text-[10px] text-slate-500">Traditional dedicated truck hiring</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Driver Notes */}
-            {listing.description && (
-              <div className="border-t border-slate-200 pt-4 space-y-1.5">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700">
-                  Notes from Driver
-                </h3>
-                <p className="text-xs text-slate-600 leading-relaxed whitespace-pre-line bg-slate-50 p-3 rounded-xl border border-slate-200">
-                  {listing.description}
-                </p>
-              </div>
-            )}
           </div>
 
-          {/* Driver Profile Card */}
-          <div className="card p-6 space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-600">
-                Driver &amp; Vehicle Profile
-              </h3>
-              <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
-                <ShieldCheck className="h-3 w-3" />
-                Verified Driver Account
-              </span>
+          {/* Driver Notes & Trip Details */}
+          {listing.description && (
+            <div className="card p-6 shadow-sm border-slate-200/90 space-y-2">
+              <h3 className="text-sm font-bold text-slate-900">Trip &amp; Cargo Handling Instructions</h3>
+              <p className="text-xs text-slate-600 leading-relaxed whitespace-pre-line">
+                {listing.description}
+              </p>
             </div>
-
-            <div className="flex items-start gap-4">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-blue-600 font-bold text-white text-lg shadow-md shadow-blue-600/20">
-                {listing.driver?.name?.charAt(0) || 'D'}
-              </div>
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <h4 className="text-base font-bold text-slate-900">{listing.driver?.name}</h4>
-                  <div className="flex items-center gap-0.5 text-xs text-amber-500 font-semibold">
-                    <Star className="h-3.5 w-3.5 fill-amber-400" />
-                    <span>4.9</span>
-                    <span className="text-[10px] text-slate-400 font-normal">(18 trips)</span>
-                  </div>
-                </div>
-
-                {listing.driver?.company_name && (
-                  <p className="text-xs font-medium text-slate-700">
-                    {listing.driver.company_name}
-                  </p>
-                )}
-
-                {listing.driver?.vehicle_number && (
-                  <p className="text-xs font-mono text-blue-600 font-semibold">
-                    Vehicle: {listing.driver.vehicle_number}
-                  </p>
-                )}
-
-                {listing.driver?.bio && (
-                  <p className="text-xs text-slate-600 pt-1 leading-relaxed">
-                    {listing.driver.bio}
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
+          )}
         </div>
 
-        {/* Right 5 Cols: Booking Request & Dynamic Status Card */}
-        <div className="lg:col-span-5 space-y-4">
-          <div className="card p-6 space-y-4 sticky top-20">
-            {/* Unauthenticated view */}
-            {!user && (
-              <div className="space-y-4 text-center py-4">
-                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 border border-blue-200">
-                  <Package className="h-6 w-6" />
+        {/* Right Column: Driver Profile & Booking Form */}
+        <div className="space-y-6 lg:col-span-4">
+          {/* Pricing & Commercial Terms Card */}
+          <div className="card p-6 shadow-sm border-slate-200/90 space-y-4">
+            <div className="border-b border-slate-100 pb-3">
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+                Commercial Pricing
+              </span>
+              <div className="flex items-baseline gap-1 mt-1">
+                <span className="text-3xl font-extrabold text-slate-900">
+                  ₹{listing.rate_per_km}
+                </span>
+                <span className="text-xs text-slate-500 font-medium">/ km rate</span>
+              </div>
+              {listing.flat_rate != null && (
+                <div className="text-xs font-semibold text-blue-600 mt-1">
+                  Full spare consignment flat rate: ₹{listing.flat_rate.toLocaleString()}
                 </div>
-                <h3 className="text-lg font-bold text-slate-900">Need to Ship on this Route?</h3>
-                <p className="text-xs text-slate-600 leading-relaxed">
-                  Sign in or register as a Customer to send a delivery request to {listing.driver?.name}. Direct WhatsApp &amp; Phone call contact will unlock immediately upon driver approval.
-                </p>
-                <div className="space-y-2 pt-2">
-                  <Link to="/login" className="btn-primary w-full text-xs">
-                    Sign in to Request Delivery
-                  </Link>
-                  <Link to="/register" className="btn-secondary w-full text-xs">
-                    Create Customer Account
-                  </Link>
+              )}
+            </div>
+
+            {/* Driver Profile Summary */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-3">
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-600 text-white font-bold text-base shadow-sm">
+                  {listing.driver?.name?.charAt(0) || 'D'}
+                </div>
+                <div>
+                  <div className="font-bold text-slate-900 flex items-center gap-1.5">
+                    {listing.driver?.name || 'Verified Transporter'}
+                    <ShieldCheck className="h-4 w-4 text-emerald-600" />
+                  </div>
+                  {listing.driver?.company_name && (
+                    <div className="text-xs text-slate-500">{listing.driver.company_name}</div>
+                  )}
                 </div>
               </div>
-            )}
 
-            {/* Driver owner viewing own listing */}
-            {isOwner && (
-              <div className="space-y-3">
-                <div className="flex items-center gap-2 text-blue-600">
-                  <Truck className="h-5 w-5" />
-                  <h3 className="text-base font-bold text-slate-900">Your Listed Route</h3>
-                </div>
-                <p className="text-xs text-slate-600 leading-relaxed">
-                  Incoming requests from senders for this trip appear on your Driver Dashboard. Accept them to reveal customer contact details.
+              {listing.driver?.bio && (
+                <p className="text-xs text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100">
+                  "{listing.driver.bio}"
                 </p>
-                <div className="rounded-xl bg-slate-50 p-3 text-xs text-slate-700 border border-slate-200 space-y-1">
-                  <span className="text-slate-500 text-[10px] uppercase font-bold">Your Registered Phone</span>
-                  <p className="font-mono font-bold text-slate-900">{listing.contact_phone}</p>
-                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Booking Action / Status Card */}
+          <div className="card p-6 shadow-sm border-slate-200/90">
+            {isMyListing ? (
+              <div className="text-center space-y-3 py-2">
+                <Truck className="mx-auto h-8 w-8 text-blue-600" />
+                <h3 className="font-bold text-slate-900 text-sm">Your Active Route Listing</h3>
+                <p className="text-xs text-slate-500">
+                  You are the operator of this trip. Track incoming consignment requests from your Driver Terminal.
+                </p>
                 <Link to="/driver" className="btn-primary w-full text-xs">
-                  Go to Driver Dashboard
+                  Go to Driver Terminal
                 </Link>
               </div>
-            )}
+            ) : myBooking ? (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+                  <h3 className="text-sm font-bold text-slate-900">Your Booking Status</h3>
+                  <StatusBadge status={myBooking.status} />
+                </div>
 
-            {/* Other Driver viewing */}
-            {user && !isOwner && user.role === 'DRIVER' && (
-              <div className="space-y-3 text-center py-4">
-                <AlertCircle className="mx-auto h-10 w-10 text-amber-500" />
-                <h3 className="text-base font-bold text-slate-900">Driver Account Detected</h3>
-                <p className="text-xs text-slate-600">
-                  Only Customer accounts can request goods transportation. Drivers post and manage their own routes.
+                <StatusTimeline status={myBooking.status} />
+
+                {myBooking.status === 'CONFIRMED' && (
+                  <div className="rounded-xl border border-emerald-200 bg-emerald-50/70 p-3.5 space-y-2 text-xs">
+                    <div className="font-bold text-emerald-900 flex items-center gap-1.5">
+                      <PhoneCall className="h-4 w-4 text-emerald-600" />
+                      Direct Driver Coordination Unlocked
+                    </div>
+                    <p className="text-emerald-800">
+                      Call or WhatsApp driver at: <strong>{listing.contact_phone || listing.driver?.phone}</strong>
+                    </p>
+                    <div className="flex gap-2 pt-1">
+                      <a
+                        href={phoneCallLink(listing.contact_phone || listing.driver?.phone)}
+                        className="btn-success flex-1 text-xs"
+                      >
+                        <PhoneCall className="h-3.5 w-3.5" /> Call Driver
+                      </a>
+                      <a
+                        href={whatsappLink(
+                          listing.contact_phone || listing.driver?.phone,
+                          `Hello ${listing.driver?.name}, I have a confirmed Enroute booking for ${listing.origin} ➔ ${listing.destination}.`
+                        )}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="btn-secondary flex-1 text-xs"
+                      >
+                        <MessageSquare className="h-3.5 w-3.5" /> WhatsApp
+                      </a>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : user && user.role === 'CUSTOMER' ? (
+              <div className="space-y-3">
+                <h3 className="text-sm font-bold text-slate-900">Request Cargo Space</h3>
+                <BookingRequestForm listing={listing} onBooked={loadData} />
+              </div>
+            ) : user && isDriver ? (
+              <div className="text-center space-y-3 py-2 text-xs text-slate-600">
+                <p>You are currently logged in as a <strong>Fleet Driver</strong>. Booking requests are placed by Shippers.</p>
+                <Link to="/driver" className="btn-secondary text-xs w-full">
+                  Go to Driver Terminal
+                </Link>
+              </div>
+            ) : (
+              <div className="text-center space-y-3 py-4">
+                <Package className="mx-auto h-8 w-8 text-blue-600" />
+                <h3 className="font-bold text-slate-900 text-sm">Want to Book Spare Space?</h3>
+                <p className="text-xs text-slate-500">
+                  Sign in or create a free Shipper account to place a cargo consignment request on this run.
                 </p>
-                <Link to="/driver" className="btn-secondary w-full text-xs">
-                  Go to Your Driver Dashboard
-                </Link>
-              </div>
-            )}
-
-            {/* Customer viewing */}
-            {user && !isOwner && user.role === 'CUSTOMER' && (
-              <div className="space-y-5">
-                {myBooking === undefined && (
-                  <div className="py-8 text-center text-xs text-slate-500">
-                    Checking active booking status…
-                  </div>
-                )}
-
-                {/* State A: Booking CONFIRMED -> Reveal Contact */}
-                {myBooking?.status === 'CONFIRMED' && (
-                  <div className="space-y-4">
-                    <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 space-y-2">
-                      <div className="flex items-center gap-2 text-emerald-700 font-bold text-sm">
-                        <ShieldCheck className="h-5 w-5" />
-                        <span>Booking Confirmed by Driver!</span>
-                      </div>
-                      <p className="text-xs text-slate-700 leading-relaxed">
-                        {listing.driver?.name} accepted your booking request #{myBooking.id}. You can now coordinate pickup location &amp; timings directly.
-                      </p>
-                    </div>
-
-                    <StatusTimeline status="CONFIRMED" />
-
-                    {/* Contact Actions */}
-                    <div className="space-y-2 pt-2">
-                      {myBooking.contact_phone && (
-                        <>
-                          <a
-                            href={whatsappLink(
-                              myBooking.contact_phone,
-                              `Hi ${listing.driver?.name}, my Enroute booking #${myBooking.id} (${myBooking.pickup_location} → ${myBooking.drop_location}) is confirmed. Let's coordinate pickup.`
-                            )}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="btn-success w-full text-xs font-bold"
-                          >
-                            <MessageSquare className="h-4 w-4" />
-                            WhatsApp Driver ({myBooking.contact_phone})
-                          </a>
-
-                          <a
-                            href={phoneCallLink(myBooking.contact_phone)}
-                            className="btn-secondary w-full text-xs font-bold text-blue-600 hover:text-blue-700"
-                          >
-                            <PhoneCall className="h-4 w-4" />
-                            Call Driver Directly
-                          </a>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {/* State B: Booking PENDING */}
-                {myBooking?.status === 'PENDING' && (
-                  <div className="space-y-4">
-                    <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 space-y-2">
-                      <div className="flex items-center gap-2 text-amber-800 font-bold text-sm">
-                        <Clock className="h-5 w-5 animate-pulse text-amber-600" />
-                        <span>Request Sent to Driver</span>
-                      </div>
-                      <p className="text-xs text-slate-700 leading-relaxed">
-                        Your booking request #{myBooking.id} is waiting for {listing.driver?.name}'s review. Contact actions unlock immediately once confirmed.
-                      </p>
-                    </div>
-
-                    <StatusTimeline status="PENDING" />
-
-                    <div className="rounded-xl bg-slate-50 p-3.5 border border-slate-200 text-xs space-y-2">
-                      <span className="text-[10px] uppercase font-bold text-slate-500">Your Submitted Shipment</span>
-                      <p className="text-slate-800 font-medium">{myBooking.goods_description}</p>
-                      <p className="text-slate-600 text-[11px]">Weight: {myBooking.estimated_weight}</p>
-                    </div>
-                  </div>
-                )}
-
-                {/* State C: Booking REJECTED */}
-                {myBooking?.status === 'REJECTED' && !showRetryForm && (
-                  <div className="space-y-4">
-                    <div className="rounded-2xl border border-red-200 bg-red-50 p-4 space-y-2">
-                      <div className="flex items-center gap-2 text-red-700 font-bold text-sm">
-                        <AlertCircle className="h-5 w-5 text-red-600" />
-                        <span>Request Declined</span>
-                      </div>
-                      <p className="text-xs text-slate-700 leading-relaxed">
-                        The driver was unable to accommodate this shipment request. You can send a revised request with different volume details.
-                      </p>
-                    </div>
-
-                    <button
-                      onClick={() => setShowRetryForm(true)}
-                      className="btn-outline w-full text-xs"
-                    >
-                      Submit Revised Request
-                    </button>
-                  </div>
-                )}
-
-                {/* State D: No booking yet OR retrying */}
-                {(myBooking === null || (myBooking?.status === 'REJECTED' && showRetryForm)) && (
-                  <div>
-                    {listing.status !== 'ACTIVE' ? (
-                      <div className="rounded-xl bg-amber-50 border border-amber-200 p-4 text-xs text-amber-800 text-center">
-                        This route is {listing.status.toLowerCase()} and is no longer accepting delivery requests.
-                      </div>
-                    ) : (
-                      <div className="space-y-4">
-                        <div>
-                          <h3 className="text-base font-bold text-slate-900">
-                            Request Delivery Space
-                          </h3>
-                          <p className="text-xs text-slate-600 mt-0.5">
-                            Submit your cargo details for {listing.driver?.name}'s review.
-                          </p>
-                        </div>
-
-                        <BookingRequestForm
-                          listing={listing}
-                          onBooked={() => {
-                            setMyBooking(undefined)
-                            setShowRetryForm(false)
-                            loadMyBookings()
-                          }}
-                        />
-                      </div>
-                    )}
-                  </div>
-                )}
+                <div className="grid grid-cols-2 gap-2 pt-1">
+                  <Link to="/login" className="btn-secondary text-xs">
+                    Sign In
+                  </Link>
+                  <Link to="/register" className="btn-primary text-xs">
+                    Get Started
+                  </Link>
+                </div>
               </div>
             )}
           </div>

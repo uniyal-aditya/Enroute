@@ -1,10 +1,15 @@
-# Python
+# Node / Frontend
+node_modules/
+dist/
+.vite/
+*.log
+
+# Python / Backend
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
 *.egg-info/
-dist/
 build/
 *.egg
 
@@ -15,22 +20,21 @@ env/
 
 # Environment variables
 .env
+*.local
 
 # Database (SQLite local dev)
 *.db
 
-# IDE
+# IDE & OS
 .vscode/
 .idea/
 *.swp
 *.swo
-
-# OS
 .DS_Store
 Thumbs.db
 
 # Alembic
 alembic/versions/__pycache__/
 
-# PDFs (project docs, not code)
+# Scratch / Docs
 *.pdf

@@ -3,7 +3,6 @@ import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-
 import L from 'leaflet'
 import '../utils/mapIcons.js'
 
-// Custom bounds adjuster
 function MapBoundsAdjuster({ origin, destination }) {
   const map = useMap()
   useEffect(() => {
@@ -38,8 +37,8 @@ export default function RouteMap({
 
   if (isNaN(oLat) || isNaN(oLng) || isNaN(dLat) || isNaN(dLng)) {
     return (
-      <div className={`flex items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 text-slate-500 text-xs ${className}`}>
-        Coordinates unavailable for map visualization
+      <div className={`flex items-center justify-center rounded-2xl border border-slate-200 bg-slate-100 text-slate-500 text-xs ${className}`}>
+        Coordinates unavailable for interactive route view
       </div>
     )
   }
@@ -47,7 +46,7 @@ export default function RouteMap({
   const center = [(oLat + dLat) / 2, (oLng + dLng) / 2]
 
   return (
-    <div className={`relative overflow-hidden rounded-2xl border border-slate-200 shadow-xs ${className}`}>
+    <div className={`relative overflow-hidden rounded-2xl border border-slate-200 shadow-sm ${className}`}>
       <MapContainer
         center={center}
         zoom={6}
@@ -61,8 +60,8 @@ export default function RouteMap({
           url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
           attribution='&copy; <a href="https://carto.com/">CARTO</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         />
-        
-        {/* Animated route polyline */}
+
+        {/* Clean Blue route polyline */}
         <Polyline
           positions={[
             [oLat, oLng],
@@ -71,25 +70,24 @@ export default function RouteMap({
           pathOptions={{
             color: '#2563eb',
             weight: 4,
-            dashArray: '8 8',
-            opacity: 0.9,
+            opacity: 0.85,
           }}
         />
 
         <Marker position={[oLat, oLng]}>
           <Popup>
-            <div className="font-sans">
-              <span className="text-[10px] font-bold uppercase text-emerald-600">Departure</span>
-              <p className="font-bold text-slate-900 text-xs">{originLabel || 'Origin'}</p>
+            <div className="p-1">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600">Origin / Pickup</span>
+              <p className="font-semibold text-slate-900 text-xs">{originLabel || 'Origin'}</p>
             </div>
           </Popup>
         </Marker>
 
         <Marker position={[dLat, dLng]}>
           <Popup>
-            <div className="font-sans">
-              <span className="text-[10px] font-bold uppercase text-blue-600">Destination</span>
-              <p className="font-bold text-slate-900 text-xs">{destinationLabel || 'Destination'}</p>
+            <div className="p-1">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-blue-600">Destination / Drop</span>
+              <p className="font-semibold text-slate-900 text-xs">{destinationLabel || 'Destination'}</p>
             </div>
           </Popup>
         </Marker>
