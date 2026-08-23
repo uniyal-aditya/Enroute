@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Truck, Package, ArrowRight, MapPin, Phone, ChevronRight, Zap } from 'lucide-react'
+import { Truck, Package, ArrowRight, Phone, ChevronRight, Zap } from 'lucide-react'
 import { useGuest } from '../context/GuestContext.jsx'
 
 const TRUCK_TYPES = [
@@ -36,11 +36,6 @@ export default function Onboarding() {
     vehicleNumber: '',
     truckType: '',
     truckCapacity: '',
-    // Customer fields
-    pickup: '',
-    destination: '',
-    goodsType: '',
-    weight: '',
   })
 
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }))
@@ -235,56 +230,14 @@ export default function Onboarding() {
               </div>
             )}
 
-            {/* CUSTOMER fields */}
+            {/* CUSTOMER: no shipment details at onboarding — they browse & book from the dashboard */}
             {role === 'CUSTOMER' && (
-              <div className="space-y-4 rounded-2xl border border-indigo-400/15 bg-indigo-500/5 p-4">
-                <div className="text-xs font-bold text-indigo-300 flex items-center gap-1.5">
-                  <Package className="h-3.5 w-3.5" /> Shipment Details
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-xs font-semibold text-white/60 mb-1.5">
-                      <MapPin className="inline h-3 w-3 mr-0.5" />Pickup Location
-                    </label>
-                    <input
-                      value={form.pickup}
-                      onChange={set('pickup')}
-                      placeholder="e.g. Dehradun"
-                      className="w-full rounded-xl border border-white/10 bg-white/10 px-3.5 py-2.5 text-xs text-white placeholder-white/30 outline-none focus:border-indigo-400/60 transition"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-white/60 mb-1.5">
-                      <MapPin className="inline h-3 w-3 mr-0.5" />Destination
-                    </label>
-                    <input
-                      value={form.destination}
-                      onChange={set('destination')}
-                      placeholder="e.g. New Delhi"
-                      className="w-full rounded-xl border border-white/10 bg-white/10 px-3.5 py-2.5 text-xs text-white placeholder-white/30 outline-none focus:border-indigo-400/60 transition"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-white/60 mb-1.5">What are you sending?</label>
-                    <select
-                      value={form.goodsType}
-                      onChange={set('goodsType')}
-                      className="w-full rounded-xl border border-white/10 bg-slate-800 px-3 py-2.5 text-xs text-white outline-none focus:border-indigo-400/60 transition"
-                    >
-                      <option value="">Select goods type</option>
-                      {GOODS_TYPES.map((g) => <option key={g}>{g}</option>)}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-white/60 mb-1.5">Approx. Weight</label>
-                    <input
-                      value={form.weight}
-                      onChange={set('weight')}
-                      placeholder="e.g. 200 kg"
-                      className="w-full rounded-xl border border-white/10 bg-white/10 px-3.5 py-2.5 text-xs text-white placeholder-white/30 outline-none focus:border-indigo-400/60 transition"
-                    />
-                  </div>
-                </div>
+              <div className="rounded-2xl border border-indigo-400/15 bg-indigo-500/5 px-4 py-3 flex items-start gap-3">
+                <Package className="h-4 w-4 text-indigo-400 mt-0.5 shrink-0" />
+                <p className="text-xs text-indigo-200/70 leading-relaxed">
+                  You can book space on any active driver route directly from your dashboard.
+                  No need to pre-fill shipment details — browse live routes and request delivery route-by-route.
+                </p>
               </div>
             )}
 
