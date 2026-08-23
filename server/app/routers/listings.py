@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session, joinedload
 from app.dependencies.database import get_db
 from app.dependencies.auth import get_current_user_optional, require_driver
 from app.models.route_listing import RouteListing, RouteStatus
+from app.models.booking import Booking, BookingStatus
 from app.models.user import User
 from app.schemas.listing import RouteListingCreate, RouteListingUpdate, RouteListingOut
 
@@ -48,11 +49,11 @@ def browse_listings(
 
     if status_filter:
         query = query.filter(RouteListing.status == status_filter)
-    if origin:
+    if origin and origin.strip():
         query = query.filter(RouteListing.origin.ilike(f"%{origin.strip()}%"))
-    if destination:
+    if destination and destination.strip():
         query = query.filter(RouteListing.destination.ilike(f"%{destination.strip()}%"))
-    if truck_type:
+    if truck_type and truck_type.strip():
         query = query.filter(RouteListing.truck_type.ilike(f"%{truck_type.strip()}%"))
     if max_rate is not None:
         query = query.filter(RouteListing.rate_per_km <= max_rate)
@@ -132,7 +133,14 @@ def delete_listing(
     current_user: User = Depends(require_driver),
 ):
     listing = _get_owned_listing(listing_id, db, current_user)
-    # Soft delete by marking cancelled
+    # Soft delete by marking route cancelled
     listing.status = RouteStatus.CANCELLED
+
+    # Cancel pending bookings
+    db.query(Booking).filter(
+        Booking.route_id == listing_id,
+        Booking.status == BookingStatus.PENDING,
+    ).update({Booking.status: BookingStatus.CANCELLED})
+
     db.commit()
     return None

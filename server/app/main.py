@@ -36,6 +36,8 @@ app.add_middleware(
 
 app.include_router(auth.router)
 app.include_router(listings.router)
+# Alias for legacy /api/listings calls
+app.include_router(listings.router, prefix="/api/listings", include_in_schema=False)
 app.include_router(bookings.router)
 app.include_router(seed.router)
 

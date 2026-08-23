@@ -13,6 +13,7 @@ import {
   Calendar,
   ShieldCheck,
   CheckCircle2,
+  XCircle,
 } from 'lucide-react'
 import api, { getApiError } from '../api/client'
 import StatusTimeline from '../components/StatusTimeline.jsx'
@@ -42,6 +43,19 @@ export default function MyBookings() {
   useEffect(() => {
     loadBookings()
   }, [])
+
+  const handleCancelBooking = async (bookingId) => {
+    if (!window.confirm('Are you sure you want to cancel this booking request?')) {
+      return
+    }
+    try {
+      await api.post(`/bookings/${bookingId}/cancel`)
+      toast.success('Booking request cancelled.')
+      loadBookings()
+    } catch (err) {
+      toast.error(getApiError(err, 'Could not cancel booking'))
+    }
+  }
 
   const safeBookings = Array.isArray(bookings) ? bookings : []
   const pending = safeBookings.filter((b) => b.status === 'PENDING').length
@@ -153,12 +167,23 @@ export default function MyBookings() {
                     </div>
                   </div>
 
-                  <Link
-                    to={`/routes/${b.route_id}`}
-                    className="btn-secondary text-xs self-start sm:self-auto"
-                  >
-                    View Corridor Page
-                  </Link>
+                  <div className="flex items-center gap-2">
+                    {b.status === 'PENDING' && (
+                      <button
+                        onClick={() => handleCancelBooking(b.id)}
+                        className="btn-outline text-rose-600 border-rose-200 hover:bg-rose-50 text-xs py-1.5 px-3"
+                      >
+                        <XCircle className="h-3.5 w-3.5" />
+                        Cancel Request
+                      </button>
+                    )}
+                    <Link
+                      to={`/routes/${b.route_id}`}
+                      className="btn-secondary text-xs self-start sm:self-auto py-1.5 px-3"
+                    >
+                      View Corridor Page
+                    </Link>
+                  </div>
                 </div>
 
                 {/* Status Stepper */}
@@ -185,20 +210,20 @@ export default function MyBookings() {
                         Driver Contact Unlocked
                       </div>
                       <p className="text-emerald-800">
-                        Driver: <strong>{b.route?.driver?.name || 'Verified Transporter'}</strong> • Phone: <strong>{b.route?.contact_phone || b.route?.driver?.phone}</strong>
+                        Driver: <strong>{b.route?.driver?.name || 'Verified Transporter'}</strong> • Phone: <strong>{b.contact_phone || b.route?.contact_phone || b.route?.driver?.phone}</strong>
                       </p>
                     </div>
 
                     <div className="flex gap-2">
                       <a
-                        href={phoneCallLink(b.route?.contact_phone || b.route?.driver?.phone)}
+                        href={phoneCallLink(b.contact_phone || b.route?.contact_phone || b.route?.driver?.phone)}
                         className="btn-success text-xs py-2 px-3"
                       >
                         <PhoneCall className="h-3.5 w-3.5" /> Call Driver
                       </a>
                       <a
                         href={whatsappLink(
-                          b.route?.contact_phone || b.route?.driver?.phone,
+                          b.contact_phone || b.route?.contact_phone || b.route?.driver?.phone,
                           `Hi ${b.route?.driver?.name}, I have a confirmed booking on your ${b.route?.origin} ➔ ${b.route?.destination} route.`
                         )}
                         target="_blank"

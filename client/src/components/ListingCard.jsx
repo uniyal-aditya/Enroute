@@ -3,6 +3,16 @@ import { Calendar, Truck, ArrowRight, Package, MapPin, ShieldCheck } from 'lucid
 import { formatDateTime, StatusBadge } from '../utils/format.jsx'
 
 export default function ListingCard({ listing, isSelected = false }) {
+  if (!listing) return null
+
+  const origin = listing.origin || 'Origin'
+  const destination = listing.destination || 'Destination'
+  const distanceKm = Math.round(Number(listing.distance_km) || 0)
+  const truckType = listing.truck_type || 'Commercial Truck'
+  const spareSpace = listing.available_space || 'Space Available'
+  const ratePerKm = listing.rate_per_km != null ? listing.rate_per_km : 0
+  const flatRate = listing.flat_rate != null ? Number(listing.flat_rate) : null
+
   return (
     <Link
       to={`/routes/${listing.id}`}
@@ -16,9 +26,9 @@ export default function ListingCard({ listing, isSelected = false }) {
       <div className="flex items-start justify-between gap-3">
         <div>
           <div className="flex items-center gap-2 text-base font-bold text-slate-900 group-hover:text-blue-600 transition-colors">
-            <span className="truncate max-w-[130px] sm:max-w-[160px]">{listing.origin}</span>
+            <span className="truncate max-w-[130px] sm:max-w-[160px]">{origin}</span>
             <ArrowRight className="h-4 w-4 shrink-0 text-blue-500 group-hover:translate-x-1 transition-transform" />
-            <span className="truncate max-w-[130px] sm:max-w-[160px]">{listing.destination}</span>
+            <span className="truncate max-w-[130px] sm:max-w-[160px]">{destination}</span>
           </div>
           <div className="mt-1 flex items-center gap-2 text-xs text-slate-500">
             <span className="flex items-center gap-1">
@@ -26,7 +36,7 @@ export default function ListingCard({ listing, isSelected = false }) {
               {formatDateTime(listing.departure_date)}
             </span>
             <span>•</span>
-            <span className="font-medium text-slate-600">{Math.round(listing.distance_km)} km</span>
+            <span className="font-medium text-slate-600">{distanceKm} km</span>
           </div>
         </div>
         <StatusBadge status={listing.status} />
@@ -36,11 +46,11 @@ export default function ListingCard({ listing, isSelected = false }) {
       <div className="mt-3.5 flex flex-wrap gap-1.5 text-xs">
         <span className="inline-flex items-center gap-1 rounded-lg bg-slate-100 px-2.5 py-1 font-semibold text-slate-700">
           <Truck className="h-3.5 w-3.5 text-blue-600" />
-          {listing.truck_type}
+          {truckType}
         </span>
         <span className="inline-flex items-center gap-1 rounded-lg bg-emerald-50 px-2.5 py-1 font-semibold text-emerald-700">
           <Package className="h-3.5 w-3.5 text-emerald-600" />
-          Spare: {listing.available_space}
+          Spare: {spareSpace}
         </span>
       </div>
 
@@ -66,13 +76,13 @@ export default function ListingCard({ listing, isSelected = false }) {
         <div className="text-right">
           <div className="flex items-baseline gap-0.5 justify-end">
             <span className="text-lg font-bold text-slate-900">
-              ₹{listing.rate_per_km}
+              ₹{ratePerKm}
             </span>
             <span className="text-[11px] text-slate-500 font-normal">/km</span>
           </div>
-          {listing.flat_rate != null && (
+          {flatRate != null && (
             <p className="text-[11px] font-semibold text-blue-600">
-              or ₹{listing.flat_rate.toLocaleString()} flat
+              or ₹{flatRate.toLocaleString('en-IN')} flat
             </p>
           )}
         </div>

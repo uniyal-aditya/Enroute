@@ -17,6 +17,7 @@ import {
   Calendar,
   Sparkles,
   User,
+  AlertCircle,
 } from 'lucide-react'
 import api, { getApiError } from '../api/client'
 import { useAuth } from '../context/AuthContext.jsx'
@@ -135,6 +136,8 @@ function CreateListingForm({ onCreated }) {
     try {
       const payload = {
         ...form,
+        origin: form.origin.trim(),
+        destination: form.destination.trim(),
         origin_lat: originPoint.lat,
         origin_lng: originPoint.lng,
         dest_lat: destPoint.lat,
@@ -363,22 +366,29 @@ function CreateListingForm({ onCreated }) {
 export default function DriverDashboard() {
   const { user } = useAuth()
   const [myListings, setMyListings] = useState([])
+  const [driverBookings, setDriverBookings] = useState([])
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState('bookings') // 'bookings' or 'post'
 
-  const loadListings = () => {
+  const loadData = async () => {
     setLoading(true)
-    api
-      .get('/listings/my-listings')
-      .then((res) => {
-        setMyListings(Array.isArray(res.data) ? res.data : [])
-      })
-      .catch(() => setMyListings([]))
-      .finally(() => setLoading(false))
+    try {
+      const [listingsRes, requestsRes] = await Promise.all([
+        api.get('/routes/my-listings').catch(() => ({ data: [] })),
+        api.get('/bookings/driver-requests').catch(() => ({ data: [] })),
+      ])
+      setMyListings(Array.isArray(listingsRes.data) ? listingsRes.data : [])
+      setDriverBookings(Array.isArray(requestsRes.data) ? requestsRes.data : [])
+    } catch {
+      setMyListings([])
+      setDriverBookings([])
+    } finally {
+      setLoading(false)
+    }
   }
 
   useEffect(() => {
-    loadListings()
+    loadData()
   }, [])
 
   const handleBookingAction = async (bookingId, newStatus) => {
@@ -386,21 +396,17 @@ export default function DriverDashboard() {
       await api.put(`/bookings/${bookingId}/status`, { status: newStatus })
       toast.success(
         newStatus === 'CONFIRMED'
-          ? 'Consignment request confirmed!'
+          ? 'Consignment request accepted!'
           : 'Booking request declined.'
       )
-      loadListings()
+      loadData()
     } catch (err) {
       toast.error(getApiError(err, 'Could not update booking status'))
     }
   }
 
-  const allBookings = myListings.flatMap((l) =>
-    (l.bookings || []).map((b) => ({ ...b, route: l }))
-  )
-
-  const pendingBookings = allBookings.filter((b) => b.status === 'PENDING')
-  const confirmedBookings = allBookings.filter((b) => b.status === 'CONFIRMED')
+  const pendingBookings = driverBookings.filter((b) => b.status === 'PENDING')
+  const confirmedBookings = driverBookings.filter((b) => b.status === 'CONFIRMED')
 
   return (
     <div className="space-y-6 py-2">
@@ -431,7 +437,7 @@ export default function DriverDashboard() {
                 : 'text-slate-600 hover:bg-slate-50'
             }`}
           >
-            Corridors &amp; Requests ({allBookings.length})
+            Corridors &amp; Requests ({driverBookings.length})
           </button>
           <button
             onClick={() => setActiveTab('post')}
@@ -456,33 +462,33 @@ export default function DriverDashboard() {
           <p className="text-xs text-slate-500">Active Corridors</p>
         </div>
 
-        <div className="card p-4 space-y-1">
+        <div className="card p-4 space-y-1 bg-amber-50/50 border-amber-200/80">
           <div className="flex items-center gap-2 text-amber-600">
             <Clock className="h-4 w-4" />
-            <span className="text-xl font-bold text-slate-900">{pendingBookings.length}</span>
+            <span className="text-xl font-bold text-amber-900">{pendingBookings.length}</span>
           </div>
-          <p className="text-xs text-slate-500">Pending Requests</p>
+          <p className="text-xs text-amber-700">Pending Requests</p>
         </div>
 
-        <div className="card p-4 space-y-1">
+        <div className="card p-4 space-y-1 bg-emerald-50/50 border-emerald-200/80">
           <div className="flex items-center gap-2 text-emerald-600">
             <CheckCircle2 className="h-4 w-4" />
-            <span className="text-xl font-bold text-slate-900">{confirmedBookings.length}</span>
+            <span className="text-xl font-bold text-emerald-900">{confirmedBookings.length}</span>
           </div>
-          <p className="text-xs text-slate-500">Confirmed Loads</p>
+          <p className="text-xs text-emerald-700">Confirmed Loads</p>
         </div>
 
-        <div className="card p-4 space-y-1">
+        <div className="card p-4 space-y-1 bg-indigo-50/50 border-indigo-200/80">
           <div className="flex items-center gap-2 text-indigo-600">
             <IndianRupee className="h-4 w-4" />
-            <span className="text-xl font-bold text-slate-900">
+            <span className="text-xl font-bold text-indigo-900">
               ₹
               {confirmedBookings
                 .reduce((acc, b) => acc + (b.route?.flat_rate || (b.route?.distance_km || 0) * (b.route?.rate_per_km || 0)), 0)
                 .toLocaleString()}
             </span>
           </div>
-          <p className="text-xs text-slate-500">Estimated Revenue</p>
+          <p className="text-xs text-indigo-700">Estimated Revenue</p>
         </div>
       </div>
 
@@ -491,7 +497,7 @@ export default function DriverDashboard() {
         <CreateListingForm
           onCreated={() => {
             setActiveTab('bookings')
-            loadListings()
+            loadData()
           }}
         />
       ) : (
@@ -578,96 +584,99 @@ export default function DriverDashboard() {
               </div>
             ) : (
               <div className="space-y-4">
-                {myListings.map((listing) => (
-                  <div key={listing.id} className="card p-5 space-y-4 shadow-sm border-slate-200/90">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
-                      <div>
+                {myListings.map((listing) => {
+                  const corridorBookings = driverBookings.filter((b) => b.route_id === listing.id)
+                  return (
+                    <div key={listing.id} className="card p-5 space-y-4 shadow-sm border-slate-200/90">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <Link
+                              to={`/routes/${listing.id}`}
+                              className="text-base font-bold text-slate-900 hover:text-blue-600 transition flex items-center gap-1.5"
+                            >
+                              {listing.origin} ➔ {listing.destination}
+                              <ArrowRight className="h-3.5 w-3.5 text-blue-600" />
+                            </Link>
+                            <StatusBadge status={listing.status} />
+                          </div>
+                          <div className="text-xs text-slate-500 mt-0.5 flex items-center gap-2">
+                            <span>{formatDateTime(listing.departure_date)}</span>
+                            <span>•</span>
+                            <span>{Math.round(listing.distance_km || 0)} km</span>
+                            <span>•</span>
+                            <span className="font-semibold text-blue-600">₹{listing.rate_per_km}/km</span>
+                          </div>
+                        </div>
+
                         <div className="flex items-center gap-2">
                           <Link
                             to={`/routes/${listing.id}`}
-                            className="text-base font-bold text-slate-900 hover:text-blue-600 transition flex items-center gap-1.5"
+                            className="btn-secondary text-xs py-1.5 px-3"
                           >
-                            {listing.origin} ➔ {listing.destination}
-                            <ArrowRight className="h-3.5 w-3.5 text-blue-600" />
+                            View Public Page
                           </Link>
-                          <StatusBadge status={listing.status} />
-                        </div>
-                        <div className="text-xs text-slate-500 mt-0.5 flex items-center gap-2">
-                          <span>{formatDateTime(listing.departure_date)}</span>
-                          <span>•</span>
-                          <span>{Math.round(listing.distance_km)} km</span>
-                          <span>•</span>
-                          <span className="font-semibold text-blue-600">₹{listing.rate_per_km}/km</span>
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-2">
-                        <Link
-                          to={`/routes/${listing.id}`}
-                          className="btn-secondary text-xs py-1.5 px-3"
-                        >
-                          View Public Page
-                        </Link>
-                      </div>
-                    </div>
-
-                    {/* Bookings on this corridor */}
-                    <div className="space-y-2">
-                      <div className="text-xs font-semibold text-slate-700">
-                        Consignment Requests ({(listing.bookings || []).length}):
-                      </div>
-                      {(!listing.bookings || listing.bookings.length === 0) ? (
-                        <div className="rounded-xl bg-slate-50 p-3 text-xs text-slate-500 text-center border border-slate-100">
-                          No cargo requests received yet for this trip.
+                      {/* Bookings on this corridor */}
+                      <div className="space-y-2">
+                        <div className="text-xs font-semibold text-slate-700">
+                          Consignment Requests ({corridorBookings.length}):
                         </div>
-                      ) : (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                          {listing.bookings.map((bk) => (
-                            <div
-                              key={bk.id}
-                              className="rounded-xl bg-slate-50 p-3.5 text-xs space-y-2 border border-slate-200/70"
-                            >
-                              <div className="flex items-center justify-between">
-                                <span className="font-bold text-slate-800">
-                                  {bk.customer?.name || 'Shipper'}
-                                </span>
-                                <StatusBadge status={bk.status} />
-                              </div>
-
-                              <div className="text-[11px] text-slate-600 space-y-0.5">
-                                <div><strong>Pickup:</strong> {bk.pickup_location}</div>
-                                <div><strong>Drop:</strong> {bk.drop_location}</div>
-                                <div><strong>Cargo:</strong> {bk.goods_description}</div>
-                              </div>
-
-                              {bk.status === 'CONFIRMED' && (
-                                <div className="flex gap-1.5 pt-1 border-t border-slate-200">
-                                  <a
-                                    href={phoneCallLink(bk.customer?.phone)}
-                                    className="btn-success flex-1 text-[11px] py-1"
-                                  >
-                                    <PhoneCall className="h-3 w-3" /> Call
-                                  </a>
-                                  <a
-                                    href={whatsappLink(
-                                      bk.customer?.phone,
-                                      `Hi ${bk.customer?.name}, regarding your confirmed Enroute consignment for ${listing.origin} ➔ ${listing.destination}.`
-                                    )}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    className="btn-secondary flex-1 text-[11px] py-1"
-                                  >
-                                    <MessageSquare className="h-3 w-3" /> WhatsApp
-                                  </a>
+                        {corridorBookings.length === 0 ? (
+                          <div className="rounded-xl bg-slate-50 p-3 text-xs text-slate-500 text-center border border-slate-100">
+                            No cargo requests received yet for this trip.
+                          </div>
+                        ) : (
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            {corridorBookings.map((bk) => (
+                              <div
+                                key={bk.id}
+                                className="rounded-xl bg-slate-50 p-3.5 text-xs space-y-2 border border-slate-200/70"
+                              >
+                                <div className="flex items-center justify-between">
+                                  <span className="font-bold text-slate-800">
+                                    {bk.customer?.name || 'Shipper'}
+                                  </span>
+                                  <StatusBadge status={bk.status} />
                                 </div>
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                      )}
+
+                                <div className="text-[11px] text-slate-600 space-y-0.5">
+                                  <div><strong>Pickup:</strong> {bk.pickup_location}</div>
+                                  <div><strong>Drop:</strong> {bk.drop_location}</div>
+                                  <div><strong>Cargo:</strong> {bk.goods_description}</div>
+                                </div>
+
+                                {bk.status === 'CONFIRMED' && (
+                                  <div className="flex gap-1.5 pt-1 border-t border-slate-200">
+                                    <a
+                                      href={phoneCallLink(bk.customer_phone || bk.customer?.phone)}
+                                      className="btn-success flex-1 text-[11px] py-1"
+                                    >
+                                      <PhoneCall className="h-3 w-3" /> Call Shipper
+                                    </a>
+                                    <a
+                                      href={whatsappLink(
+                                        bk.customer_phone || bk.customer?.phone,
+                                        `Hi ${bk.customer?.name}, regarding your confirmed Enroute consignment for ${listing.origin} ➔ ${listing.destination}.`
+                                      )}
+                                      target="_blank"
+                                      rel="noreferrer"
+                                      className="btn-secondary flex-1 text-[11px] py-1"
+                                    >
+                                      <MessageSquare className="h-3 w-3" /> WhatsApp
+                                    </a>
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             )}
           </div>

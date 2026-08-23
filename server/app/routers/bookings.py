@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session, joinedload
 
 from app.dependencies.database import get_db
-from app.dependencies.auth import require_customer, require_driver
+from app.dependencies.auth import require_customer, require_driver, get_current_user
 from app.models.booking import Booking, BookingStatus
 from app.models.route_listing import RouteListing, RouteStatus
 from app.models.user import User
@@ -26,7 +26,7 @@ def create_booking(
             detail="This route is no longer accepting booking requests",
         )
 
-    # Prevent customers from booking their own listing (if dual account logic ever occurred)
+    # Prevent customers from booking their own listing
     if route.driver_id == current_user.id:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -45,16 +45,16 @@ def create_booking(
     if existing:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"You already have a {existing.status.value.lower()} request on this route",
+            detail=f"You already have an active ({existing.status.value.lower()}) request on this route",
         )
 
     booking = Booking(
         customer_id=current_user.id,
         route_id=payload.route_id,
-        pickup_location=payload.pickup_location,
-        drop_location=payload.drop_location,
-        goods_description=payload.goods_description,
-        estimated_weight=payload.estimated_weight,
+        pickup_location=payload.pickup_location.strip(),
+        drop_location=payload.drop_location.strip(),
+        goods_description=payload.goods_description.strip(),
+        estimated_weight=payload.estimated_weight.strip(),
         status=BookingStatus.PENDING,
     )
     db.add(booking)
@@ -75,6 +75,7 @@ def create_booking(
     if out.route:
         out.route.contact_phone = None
     out.contact_phone = None
+    out.customer_phone = current_user.phone
     return out
 
 
@@ -98,8 +99,13 @@ def my_bookings(
         out = BookingOut.model_validate(b)
         if out.route:
             out.route.contact_phone = None
-        # Driver's contact phone is only unlocked once the booking is CONFIRMED or COMPLETED
-        out.contact_phone = b.route.contact_phone if b.status in (BookingStatus.CONFIRMED, BookingStatus.COMPLETED) else None
+        # Driver's contact phone is unlocked once CONFIRMED or COMPLETED
+        out.contact_phone = (
+            b.route.contact_phone
+            if b.status in (BookingStatus.CONFIRMED, BookingStatus.COMPLETED)
+            else None
+        )
+        out.customer_phone = current_user.phone
         results.append(out)
     return results
 
@@ -132,6 +138,7 @@ def driver_requests(
     return results
 
 
+@router.put("/{booking_id}/status", response_model=BookingOut)
 @router.patch("/{booking_id}/status", response_model=BookingOut)
 def update_booking_status(
     booking_id: int,
@@ -155,11 +162,6 @@ def update_booking_status(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="You can only manage booking requests on your own routes",
         )
-    if booking.status not in (BookingStatus.PENDING, BookingStatus.CONFIRMED):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"This booking is already {booking.status.value}",
-        )
 
     booking.status = payload.status
     db.commit()
@@ -170,4 +172,43 @@ def update_booking_status(
         out.route.contact_phone = None
     out.contact_phone = booking.route.contact_phone
     out.customer_phone = booking.customer.phone if booking.customer else None
+    return out
+
+
+@router.post("/{booking_id}/cancel", response_model=BookingOut)
+@router.put("/{booking_id}/cancel", response_model=BookingOut)
+def cancel_booking(
+    booking_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Allows a customer to cancel their pending booking or a driver to cancel a booking."""
+    booking = (
+        db.query(Booking)
+        .options(
+            joinedload(Booking.route).joinedload(RouteListing.driver),
+            joinedload(Booking.customer),
+        )
+        .filter(Booking.id == booking_id)
+        .first()
+    )
+    if not booking:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Booking not found")
+
+    is_customer_owner = booking.customer_id == current_user.id
+    is_driver_owner = booking.route.driver_id == current_user.id
+
+    if not (is_customer_owner or is_driver_owner):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You do not have permission to cancel this booking",
+        )
+
+    booking.status = BookingStatus.CANCELLED
+    db.commit()
+    db.refresh(booking)
+
+    out = BookingOut.model_validate(booking)
+    if out.route:
+        out.route.contact_phone = None
     return out
