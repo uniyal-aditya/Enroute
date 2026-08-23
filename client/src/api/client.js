@@ -3,11 +3,23 @@ import axios from 'axios'
 const TOKEN_KEY = 'enroute_token'
 
 // Prioritize VITE_API_URL or VITE_API_BASE, fallback to relative /api
+// In production (Vercel), VITE_API_BASE must be set to the Railway backend URL
+// e.g. VITE_API_BASE=https://<your-project>.up.railway.app  (no /api suffix)
 const getBaseUrl = () => {
   const envUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE
   if (envUrl) {
     const cleanUrl = envUrl.replace(/\/+$/, '')
+    // Guard against accidental double /api (e.g. VITE_API_BASE=https://host/api)
     return cleanUrl.endsWith('/api') ? cleanUrl : `${cleanUrl}/api`
+  }
+  // Fallback: relative path — only works locally via Vite dev proxy.
+  // In production this WILL cause 405 errors if VITE_API_BASE is not set.
+  if (import.meta.env.PROD) {
+    console.error(
+      '[Enroute] VITE_API_BASE is not set. ' +
+        'API requests will fail in production. ' +
+        'Set VITE_API_BASE=https://<railway-domain> in your Vercel environment variables.'
+    )
   }
   return '/api'
 }
